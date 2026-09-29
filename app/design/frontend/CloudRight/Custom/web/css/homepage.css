@@ -1,0 +1,527 @@
+/* =========================================================
+   CLOUDRIGHT GLOBAL
+   ========================================================= */
+
+.cloudright-homepage {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #172033;
+    background: #f6f8fb;
+}
+
+
+/* =========================================================
+   CLOUDRIGHT HEADER
+   ========================================================= */
+
+.cloudright-header {
+    width: 100%;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e9f0;
+}
+
+.cloudright-header-top {
+    width: 100%;
+    background: #ffffff;
+}
+
+.cloudright-header-inner {
+    max-width: 1400px;
+    min-height: 76px;
+    margin: 0 auto;
+    padding: 0 35px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    box-sizing: border-box;
+}
+
+.cloudright-logo {
+    min-width: 190px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #172033;
+    text-decoration: none;
+}
+
+.cloudright-logo:hover {
+    color: #172033;
+    text-decoration: none;
+}
+
+.cloudright-logo-mark {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    background: #1769d1;
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.cloudright-logo-text {
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.cloudright-search {
+    flex: 1;
+    max-width: 680px;
+}
+
+.cloudright-search form {
+    width: 100%;
+    height: 44px;
+    display: flex;
+    border: 1px solid #d9dfe8;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f7f9fc;
+}
+
+.cloudright-search input {
+    flex: 1;
+    min-width: 0;
+    padding: 0 16px;
+    border: 0 !important;
+    outline: none !important;
+    background: transparent;
+    box-shadow: none !important;
+    font-size: 14px;
+}
+
+.cloudright-search button {
+    width: 52px;
+    border: 0;
+    background: #1769d1;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.cloudright-search button:hover {
+    background: #0f56b0;
+}
+
+.cloudright-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.cloudright-header-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #172033;
+    text-decoration: none;
+}
+
+.cloudright-header-link:hover {
+    color: #1769d1;
+    text-decoration: none;
+}
+
+.cloudright-action-icon {
+    font-size: 25px;
+}
+
+.cloudright-header-link small,
+.cloudright-header-link strong {
+    display: block;
+}
+
+.cloudright-header-link small {
+    margin-bottom: 2px;
+    color: #7a8392;
+    font-size: 11px;
+    line-height: 1;
+}
+
+.cloudright-header-link strong {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.cloudright-nav {
+    width: 100%;
+    background: #172033;
+}
+
+.cloudright-nav-inner {
+    max-width: 1400px;
+    min-height: 46px;
+    margin: 0 auto;
+    padding: 0 35px;
+    display: flex;
+    align-items: center;
+    gap: 35px;
+    box-sizing: border-box;
+}
+
+.cloudright-nav-inner a {
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.cloudright-nav-inner a:hover {
+    color: #bcd8ff;
+    text-decoration: none;
+}
+
+
+/* =========================================================
+   CLOUDRIGHT HERO
+   ========================================================= */
+
+.cloudright-hero {
+    max-width: 1400px;
+    min-height: 430px;
+    margin: 0 auto;
+    padding: 60px 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    background: linear-gradient(
+        135deg,
+        #eaf3ff 0%,
+        #ffffff 55%,
+        #eef7ff 100%
+    );
+}
+
+.cloudright-hero-content {
+    max-width: 620px;
+}
+
+.cloudright-badge {
+    display: inline-block;
+    margin-bottom: 18px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: #e4efff;
+    color: #1769d1;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+}
+
+.cloudright-hero h1 {
+    margin: 0 0 20px;
+    font-size: 52px;
+    line-height: 1.08;
+    font-weight: 800;
+    color: #14213d;
+}
+
+.cloudright-hero p {
+    max-width: 560px;
+    margin: 0 0 30px;
+    font-size: 18px;
+    line-height: 1.7;
+    color: #5c6678;
+}
+
+.cloudright-btn {
+    display: inline-block;
+    padding: 14px 30px;
+    border-radius: 6px;
+    background: #1769d1;
+    color: #ffffff !important;
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+.cloudright-btn:hover {
+    background: #0f56b0;
+    text-decoration: none;
+    transform: translateY(-2px);
+}
+
+.cloudright-hero-visual {
+    width: 360px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cloudright-product-card {
+    width: 260px;
+    min-height: 220px;
+    padding: 35px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 15px 45px rgba(20, 33, 61, 0.12);
+    text-align: center;
+}
+
+.cloudright-product-icon {
+    margin-bottom: 20px;
+    font-size: 70px;
+}
+
+.cloudright-product-card strong {
+    margin-bottom: 8px;
+    font-size: 20px;
+    color: #172033;
+}
+
+.cloudright-product-card span {
+    color: #697386;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   CLOUDRIGHT CATEGORIES
+   ========================================================= */
+
+.cloudright-categories {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 60px 50px;
+    box-sizing: border-box;
+}
+
+.cloudright-section-heading {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.cloudright-section-heading h2 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    color: #172033;
+}
+
+.cloudright-section-heading p {
+    margin: 0;
+    color: #70798a;
+    font-size: 16px;
+}
+
+.cloudright-category-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+}
+
+.cloudright-category-card {
+    min-height: 190px;
+    padding: 30px 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 5px 20px rgba(20, 33, 61, 0.07);
+    text-align: center;
+    text-decoration: none;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.cloudright-category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(20, 33, 61, 0.12);
+    text-decoration: none;
+}
+
+.cloudright-category-icon {
+    margin-bottom: 18px;
+    font-size: 48px;
+}
+
+.cloudright-category-card h3 {
+    margin: 0 0 8px;
+    font-size: 19px;
+    color: #172033;
+}
+
+.cloudright-category-card span {
+    color: #1769d1;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   CLOUDRIGHT FEATURES
+   ========================================================= */
+
+.cloudright-features {
+    max-width: 1400px;
+    margin: 0 auto 50px;
+    padding: 30px 50px;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    background: #ffffff;
+    border-radius: 12px;
+}
+
+.cloudright-feature {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.cloudright-feature-icon {
+    flex-shrink: 0;
+    font-size: 30px;
+}
+
+.cloudright-feature h3 {
+    margin: 0 0 5px;
+    font-size: 16px;
+    color: #172033;
+}
+
+.cloudright-feature p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #747d8e;
+}
+
+
+/* =========================================================
+   CLOUDRIGHT RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    .cloudright-header-inner {
+        padding: 0 20px;
+        gap: 15px;
+    }
+
+    .cloudright-logo {
+        min-width: auto;
+    }
+
+    .cloudright-logo-text {
+        display: none;
+    }
+
+    .cloudright-header-actions {
+        gap: 12px;
+    }
+
+    .cloudright-nav-inner {
+        padding: 0 20px;
+        gap: 20px;
+        overflow-x: auto;
+    }
+
+    .cloudright-hero {
+        padding: 45px 30px;
+    }
+
+    .cloudright-hero h1 {
+        font-size: 40px;
+    }
+
+    .cloudright-category-grid,
+    .cloudright-features {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cloudright-hero-visual {
+        width: 280px;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .cloudright-header-inner {
+        min-height: 65px;
+        flex-wrap: wrap;
+        padding: 10px 15px;
+    }
+
+    .cloudright-search {
+        order: 3;
+        flex-basis: 100%;
+        max-width: none;
+    }
+
+    .cloudright-header-actions {
+        margin-left: auto;
+    }
+
+    .cloudright-header-link span:not(.cloudright-action-icon) {
+        display: none;
+    }
+
+    .cloudright-nav-inner {
+        min-height: 42px;
+        padding: 0 15px;
+    }
+
+    .cloudright-nav-inner a {
+        white-space: nowrap;
+        font-size: 13px;
+    }
+}
+
+
+@media (max-width: 650px) {
+
+    .cloudright-hero {
+        flex-direction: column;
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .cloudright-hero p {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .cloudright-hero-visual {
+        width: 100%;
+        margin-top: 35px;
+    }
+
+    .cloudright-categories {
+        padding: 45px 20px;
+    }
+
+    .cloudright-category-grid,
+    .cloudright-features {
+        grid-template-columns: 1fr;
+    }
+
+    .cloudright-features {
+        margin-left: 20px;
+        margin-right: 20px;
+        padding: 25px;
+    }
+}
+

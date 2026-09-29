@@ -72,3 +72,9 @@ atlassian*
 /generated/*
 !/generated/.htaccess
 .DS_Store
+
+# Local test and temporary files
+cookies.txt
+magento-cookies.txt
+login.html
+build.log

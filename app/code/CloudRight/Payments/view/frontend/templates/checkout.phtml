@@ -1,0 +1,719 @@
+<?php
+/**
+ * CloudRight checkout modal template.
+ *
+ * @var \CloudRight\Payments\Block\Checkout $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+
+<div
+    id="cloudright-modal-root"
+    class="cloudright-modal-overlay cloudright-overlay"
+    data-cloudright-root="1"
+    data-cart-api-url="<?= $escaper->escapeUrl($block->getCartApiUrl()) ?>"
+    data-order-api-url="<?= $escaper->escapeUrl($block->getOrderApiUrl()) ?>"
+    data-cart-page-url="<?= $escaper->escapeUrl($block->getCartPageUrl()) ?>"
+    aria-hidden="true"
+    style="display:none;"
+>
+    <div
+        class="cloudright-checkout-modal cloudright-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cloudright-modal-title"
+    >
+
+
+    <!-- =====================================================
+         TOP BAR
+         ===================================================== -->
+
+    <header class="cloudright-modal-topbar cloudright-modal-header">
+
+        <div class="cloudright-brand-area">
+
+            <div
+                class="cloudright-brand-mark"
+                aria-hidden="true"
+            >
+                CR
+            </div>
+
+            <div class="cloudright-brand-content">
+
+                <div class="cloudright-brand">
+                    CloudRight
+                </div>
+
+                <div class="cloudright-brand-caption">
+                    Secure Checkout
+                </div>
+
+            </div>
+
+        </div>
+
+        <button
+            type="button"
+            class="cloudright-close cloudright-modal-close"
+            data-cloudright-close
+            aria-label="<?= $escaper->escapeHtmlAttr(__('Close CloudRight checkout')) ?>"
+        >
+            <span></span>
+            <span></span>
+        </button>
+
+    </header>
+
+
+    <!-- =====================================================
+         PROGRESS
+         ===================================================== -->
+
+    <div
+        class="cloudright-progress"
+        aria-label="<?= $escaper->escapeHtmlAttr(__('Checkout steps')) ?>"
+    >
+
+        <div
+            class="cloudright-progress-step active"
+            data-step-indicator="account"
+        >
+            <span class="cloudright-step-number">
+                1
+            </span>
+
+            <span class="cloudright-step-label">
+                <?= $escaper->escapeHtml(__('Account')) ?>
+            </span>
+        </div>
+
+        <div class="cloudright-progress-line"></div>
+
+        <div
+            class="cloudright-progress-step"
+            data-step-indicator="payment"
+        >
+            <span class="cloudright-step-number">
+                2
+            </span>
+
+            <span class="cloudright-step-label">
+                <?= $escaper->escapeHtml(__('Payment')) ?>
+            </span>
+        </div>
+
+        <div class="cloudright-progress-line"></div>
+
+        <div
+            class="cloudright-progress-step"
+            data-step-indicator="confirmation"
+        >
+            <span class="cloudright-step-number">
+                3
+            </span>
+
+            <span class="cloudright-step-label">
+                <?= $escaper->escapeHtml(__('Confirmation')) ?>
+            </span>
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CHECKOUT BODY
+         ===================================================== -->
+
+    <main class="cloudright-checkout-body cloudright-modal-body">
+
+
+        <!-- =================================================
+             ACCOUNT STEP
+             ================================================= -->
+
+        <section
+            class="cloudright-account-panel cloudright-panel is-active"
+            data-step-panel="account"
+        >
+
+            <div class="cloudright-account-layout">
+
+                <div class="cloudright-account-content">
+
+                    <div class="cloudright-welcome">
+
+                        <div
+                            class="cloudright-welcome-icon"
+                            aria-hidden="true"
+                        >
+                            👋
+                        </div>
+
+                        <div>
+
+                            <h2
+                                id="cloudright-modal-title"
+                                class="cloudright-title"
+                            >
+                                <?= $escaper->escapeHtml(
+                                    __('Welcome to CloudRight')
+                                ) ?>
+                            </h2>
+
+                            <p class="cloudright-subtitle">
+                                <?= $escaper->escapeHtml(
+                                    __('Login to continue your checkout.')
+                                ) ?>
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <form
+                        class="cloudright-account-form"
+                        data-cloudright-account-form
+                        novalidate
+                    >
+
+                        <div class="cloudright-form-heading">
+
+                            <h2>
+                                <?= $escaper->escapeHtml(
+                                    __('Login to Continue')
+                                ) ?>
+                            </h2>
+
+                            <p>
+                                <?= $escaper->escapeHtml(
+                                    __('Enter your registered email to continue.')
+                                ) ?>
+                            </p>
+
+                        </div>
+
+
+                        <div class="cloudright-form-group">
+
+                            <label
+                                class="cloudright-label"
+                                for="cloudright-email"
+                            >
+                                <?= $escaper->escapeHtml(
+                                    __('Email address')
+                                ) ?>
+                            </label>
+
+                            <div class="cloudright-input-wrapper">
+
+                                <span
+                                    class="cloudright-input-icon"
+                                    aria-hidden="true"
+                                >
+                                    @
+                                </span>
+
+                                <input
+                                    type="email"
+                                    id="cloudright-email"
+                                    name="email"
+                                    class="cloudright-input cloudright-account-input"
+                                    data-cloudright-email-input
+                                    placeholder="<?= $escaper->escapeHtmlAttr(
+                                        __('you@example.com')
+                                    ) ?>"
+                                    autocomplete="email"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <p
+                            class="cloudright-error cloudright-form-error"
+                            data-cloudright-email-error
+                            role="alert"
+                            hidden
+                        ></p>
+
+
+                        <button
+                            type="submit"
+                            class="cloudright-btn cloudright-btn-primary cloudright-primary-button"
+                            data-cloudright-continue
+                        >
+
+                            <span class="cloudright-btn-label">
+                                <?= $escaper->escapeHtml(
+                                    __('Continue')
+                                ) ?>
+                            </span>
+
+                            <span
+                                class="cloudright-button-arrow"
+                                aria-hidden="true"
+                            >
+                                →
+                            </span>
+
+                            <span
+                                class="cloudright-spinner cloudright-loading-spinner"
+                                aria-hidden="true"
+                                hidden
+                            ></span>
+
+                        </button>
+
+
+                        <div class="cloudright-secure-note">
+
+                            <span aria-hidden="true">
+                                ✓
+                            </span>
+
+                            <?= $escaper->escapeHtml(
+                                __('Your information is securely handled.')
+                            ) ?>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+
+                <!-- =========================================
+                     ORDER PREVIEW
+                     ========================================= -->
+
+                <aside class="cloudright-order-preview">
+
+                    <div class="cloudright-preview-heading">
+
+                        <span>
+                            <?= $escaper->escapeHtml(
+                                __('Your order')
+                            ) ?>
+                        </span>
+
+                        <span
+                            class="cloudright-preview-lock"
+                            aria-hidden="true"
+                        >
+                            🔒
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        class="cloudright-preview-items cloudright-summary-items"
+                        data-cloudright-summary-items
+                    >
+
+                        <p
+                            class="cloudright-summary-loading"
+                            data-cloudright-cart-loading
+                        >
+                            <?= $escaper->escapeHtml(
+                                __('Loading your cart...')
+                            ) ?>
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        class="cloudright-preview-total cloudright-summary-totals"
+                        data-cloudright-summary-totals
+                        hidden
+                    >
+
+                        <span>
+                            <?= $escaper->escapeHtml(
+                                __('Estimated total')
+                            ) ?>
+                        </span>
+
+                        <strong data-cloudright-grand-total>
+                            &mdash;
+                        </strong>
+
+                    </div>
+
+
+                    <div class="cloudright-trust-list">
+
+                        <div>
+                            <span>✓</span>
+                            <?= $escaper->escapeHtml(
+                                __('Secure checkout')
+                            ) ?>
+                        </div>
+
+                        <div>
+                            <span>✓</span>
+                            <?= $escaper->escapeHtml(
+                                __('Order confirmation by email')
+                            ) ?>
+                        </div>
+
+                        <div>
+                            <span>✓</span>
+                            <?= $escaper->escapeHtml(
+                                __('CloudRight protected payment')
+                            ) ?>
+                        </div>
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PAYMENT STEP
+             ================================================= -->
+
+        <section
+            class="cloudright-payment-body cloudright-panel"
+            data-step-panel="payment"
+        >
+
+            <div class="cloudright-payment-layout">
+
+                <div class="cloudright-payment-main cloudright-payment-content">
+
+                    <div class="cloudright-payment-heading">
+
+                        <span
+                            class="cloudright-heading-icon"
+                            aria-hidden="true"
+                        >
+                            💳
+                        </span>
+
+                        <div>
+
+                            <h2 class="cloudright-title">
+                                <?= $escaper->escapeHtml(
+                                    __('Complete your payment')
+                                ) ?>
+                            </h2>
+
+                            <p class="cloudright-subtitle">
+                                <?= $escaper->escapeHtml(
+                                    __('Review your order and complete the payment securely.')
+                                ) ?>
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CUSTOMER -->
+
+                    <div class="cloudright-customer-badge">
+
+                        <span
+                            class="cloudright-customer-avatar"
+                            aria-hidden="true"
+                        >
+                            C
+                        </span>
+
+                        <div class="cloudright-customer-details">
+
+                            <strong data-cloudright-customer-name>
+                                &mdash;
+                            </strong>
+
+                            <span data-cloudright-customer-email>
+                                &mdash;
+                            </span>
+
+                        </div>
+
+                        <button
+                            type="button"
+                            class="cloudright-btn-link"
+                            data-cloudright-change-account
+                        >
+                            <?= $escaper->escapeHtml(
+                                __('Change')
+                            ) ?>
+                        </button>
+
+                    </div>
+
+
+                    <!-- PAYMENT ITEMS -->
+
+                    <div
+                        class="cloudright-cart-items cloudright-order-items"
+                        data-cloudright-payment-items
+                    ></div>
+
+
+                    <!-- TOTAL -->
+
+                    <div class="cloudright-total-section">
+
+                        <span>
+                            <?= $escaper->escapeHtml(
+                                __('Total amount')
+                            ) ?>
+                        </span>
+
+                        <strong data-cloudright-payment-total>
+                            &mdash;
+                        </strong>
+
+                    </div>
+
+
+                    <!-- PAYMENT ERROR -->
+
+                    <p
+                        class="cloudright-error cloudright-form-error"
+                        data-cloudright-payment-error
+                        role="alert"
+                        hidden
+                    ></p>
+
+
+                    <!-- ACTIONS -->
+
+                    <div class="cloudright-actions">
+
+                        <button
+                            type="button"
+                            class="cloudright-btn cloudright-secondary-button"
+                            data-cloudright-cancel
+                        >
+                            <?= $escaper->escapeHtml(
+                                __('Cancel payment')
+                            ) ?>
+                        </button>
+
+                        <button
+                            type="button"
+                            class="cloudright-btn cloudright-btn-primary cloudright-primary-button"
+                            data-cloudright-pay
+                        >
+
+                            <span class="cloudright-btn-label">
+                                <?= $escaper->escapeHtml(
+                                    __('Pay Securely')
+                                ) ?>
+                            </span>
+
+                            <span
+                                class="cloudright-button-arrow"
+                                aria-hidden="true"
+                            >
+                                →
+                            </span>
+
+                            <span
+                                class="cloudright-spinner cloudright-loading-spinner"
+                                aria-hidden="true"
+                                hidden
+                            ></span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PAYMENT SECURITY SIDE -->
+
+                <aside class="cloudright-payment-side">
+
+                    <div class="cloudright-side-title">
+                        <?= $escaper->escapeHtml(
+                            __('Secure payment')
+                        ) ?>
+                    </div>
+
+                    <div
+                        class="cloudright-security-icon"
+                        aria-hidden="true"
+                    >
+                        🔒
+                    </div>
+
+                    <p>
+                        <?= $escaper->escapeHtml(
+                            __('Your payment is processed securely through CloudRight.')
+                        ) ?>
+                    </p>
+
+                    <div class="cloudright-side-features">
+
+                        <div>
+                            <span>✓</span>
+                            <?= $escaper->escapeHtml(
+                                __('Secure transaction')
+                            ) ?>
+                        </div>
+
+                        <div>
+                            <span>✓</span>
+                            <?= $escaper->escapeHtml(
+                                __('Order confirmation')
+                            ) ?>
+                        </div>
+
+                        <div>
+                            <span>✓</span>
+                            <?= $escaper->escapeHtml(
+                                __('Email receipt')
+                            ) ?>
+                        </div>
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CONFIRMATION STEP
+             ================================================= -->
+
+        <section
+            class="cloudright-confirmation-panel cloudright-panel"
+            data-step-panel="confirmation"
+        >
+
+            <div class="cloudright-confirmation">
+
+                <div
+                    class="cloudright-success-icon"
+                    aria-hidden="true"
+                >
+                    ✓
+                </div>
+
+
+                <span class="cloudright-success-label">
+                    <?= $escaper->escapeHtml(
+                        __('Payment Successful')
+                    ) ?>
+                </span>
+
+
+                <h2 class="cloudright-title">
+                    <?= $escaper->escapeHtml(
+                        __('Thank You!')
+                    ) ?>
+                </h2>
+
+
+                <p class="cloudright-confirmation-text">
+                    <?= $escaper->escapeHtml(
+                        __('Your order has been successfully placed.')
+                    ) ?>
+                </p>
+
+
+                <div class="cloudright-confirmation-details">
+
+                    <div class="cloudright-confirmation-row">
+
+                        <span>
+                            <?= $escaper->escapeHtml(
+                                __('Order Number')
+                            ) ?>
+                        </span>
+
+                        <strong data-cloudright-order-number>
+                            &mdash;
+                        </strong>
+
+                    </div>
+
+
+                    <div class="cloudright-confirmation-row">
+
+                        <span>
+                            <?= $escaper->escapeHtml(
+                                __('Payment Status')
+                            ) ?>
+                        </span>
+
+                        <span
+                            class="cloudright-badge-paid"
+                            data-cloudright-payment-status
+                        >
+                            <?= $escaper->escapeHtml(
+                                __('Paid')
+                            ) ?>
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <p class="cloudright-confirmation-note">
+                    <?= $escaper->escapeHtml(
+                        __('You will receive your order details shortly.')
+                    ) ?>
+                </p>
+
+
+                <button
+                    type="button"
+                    class="cloudright-btn cloudright-btn-primary cloudright-primary-button"
+                    data-cloudright-continue-shopping
+                >
+                    <?= $escaper->escapeHtml(
+                        __('Continue Shopping')
+                    ) ?>
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+         ===================================================== -->
+
+    <footer class="cloudright-modal-footer">
+
+        <span>
+            © <?= date('Y') ?> CloudRight
+        </span>
+
+        <span>
+            <?= $escaper->escapeHtml(
+                __('Secure checkout')
+            ) ?>
+        </span>
+
+    </footer>
+
+</div>
+
+
+</div>

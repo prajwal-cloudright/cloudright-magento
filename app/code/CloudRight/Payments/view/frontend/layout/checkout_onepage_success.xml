@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+    CloudRight Payments
+    Custom Magento Order Received / Thank You page.
+-->
+<page
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    layout="1column"
+    xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+
+    <head>
+        <title>Order Received | CloudRight</title>
+
+        <css src="CloudRight_Payments::css/cloudright-success.css"/>
+    </head>
+
+    <body>
+
+        <referenceBlock name="page.main.title" remove="true"/>
+
+        <referenceBlock name="checkout.success" remove="true"/>
+
+        <referenceBlock name="checkout.registration" remove="true"/>
+
+        <referenceContainer name="content">
+            <block
+                class="CloudRight\Payments\Block\Onepage\Success"
+                name="cloudright.checkout.success"
+                template="CloudRight_Payments::onepage/success.phtml"
+                cacheable="false"/>
+        </referenceContainer>
+
+    </body>
+</page>
+

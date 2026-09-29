@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <preference for="CloudRight\Payments\Api\OrderManagementInterface"
+                type="CloudRight\Payments\Model\OrderManagement"/>
+
+    <preference for="CloudRight\Payments\Api\PaymentInterface"
+                type="CloudRight\Payments\Model\Payment"/>
+
+    <preference for="CloudRight\Payments\Api\Data\OrderResultInterface"
+                type="CloudRight\Payments\Model\Data\OrderResult"/>
+
+    <type name="CloudRight\Payments\Model\PaymentMethod">
+        <arguments>
+            <argument name="context" xsi:type="object">Magento\Framework\Model\Context</argument>
+            <argument name="registry" xsi:type="object">Magento\Framework\Registry</argument>
+            <argument name="extensionFactory" xsi:type="object">Magento\Framework\Api\ExtensionAttributesFactory</argument>
+            <argument name="customAttributeFactory" xsi:type="object">Magento\Framework\Api\AttributeValueFactory</argument>
+            <argument name="paymentData" xsi:type="object">Magento\Payment\Helper\Data</argument>
+            <argument name="scopeConfig" xsi:type="object">Magento\Framework\App\Config\ScopeConfigInterface</argument>
+            <argument name="logger" xsi:type="object">Magento\Payment\Model\Method\Logger</argument>
+        </arguments>
+    </type>
+
+</config>

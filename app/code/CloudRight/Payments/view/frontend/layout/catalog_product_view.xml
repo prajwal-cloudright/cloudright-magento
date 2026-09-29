@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+
+    <head>
+        <css src="CloudRight_Payments::css/cloudright-checkout.css"/>
+    </head>
+
+    <body>
+
+        <referenceContainer name="before.body.end">
+
+            <block class="CloudRight\Payments\Block\Checkout"
+                   name="cloudright.checkout.product.modal"
+                   template="CloudRight_Payments::checkout.phtml"/>
+
+            <block class="CloudRight\Payments\Block\Checkout"
+                   name="cloudright.checkout.product.script"
+                   template="CloudRight_Payments::checkout-script.phtml"
+                   after="cloudright.checkout.product.modal"/>
+
+        </referenceContainer>
+
+        <referenceContainer name="product.info.main">
+
+            <block class="CloudRight\Payments\Block\Checkout"
+                   name="cloudright.custom.product.button"
+                   template="CloudRight_Payments::custom-checkout-button.phtml"
+                   after="product.info.addtocart"/>
+
+        </referenceContainer>
+
+    </body>
+</page>

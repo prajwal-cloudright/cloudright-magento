@@ -1,0 +1,8 @@
+{
+    "sales_order": {
+        "column": {
+            "cloudright_transaction_id": true,
+            "cloudright_payment_status": true
+        }
+    }
+}

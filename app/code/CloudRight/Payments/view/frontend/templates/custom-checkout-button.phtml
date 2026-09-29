@@ -1,0 +1,18 @@
+<?php
+/**
+ * CloudRight custom checkout button.
+ *
+ * @var \CloudRight\Payments\Block\Checkout $block
+ */
+?>
+
+<div class="cloudright-custom-checkout-wrapper">
+    <button
+        type="button"
+        class="action primary cloudright-custom-checkout-button"
+        onclick="if (window.cloudRightOpenCheckout) { window.cloudRightOpenCheckout(); }"
+    >
+        <span>Proceed to Checkout</span>
+    </button>
+</div>
+

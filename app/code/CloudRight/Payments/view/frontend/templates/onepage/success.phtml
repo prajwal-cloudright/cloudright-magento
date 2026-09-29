@@ -1,0 +1,321 @@
+<?php
+/**
+ * CloudRight Payments
+ *
+ * Professional Order Received / Thank You page.
+ *
+ * @var \CloudRight\Payments\Block\Onepage\Success $block
+ */
+
+$order = $block->getOrder();
+?>
+
+<div class="cloudright-success-page">
+
+    <?php if ($order): ?>
+
+        <!-- Progress -->
+        <div class="cloudright-success-progress">
+            <div class="cloudright-progress-step cloudright-progress-complete">
+                <span class="cloudright-progress-number">1</span>
+                <span class="cloudright-progress-label">
+                    <?= $block->escapeHtml(__('Order Received')) ?>
+                </span>
+            </div>
+
+            <div class="cloudright-progress-line cloudright-progress-line-active"></div>
+
+            <div class="cloudright-progress-step cloudright-progress-complete">
+                <span class="cloudright-progress-check">✓</span>
+                <span class="cloudright-progress-label">
+                    <?= $block->escapeHtml(__('Payment Successful')) ?>
+                </span>
+            </div>
+
+            <div class="cloudright-progress-line"></div>
+
+            <div class="cloudright-progress-step">
+                <span class="cloudright-progress-number">3</span>
+                <span class="cloudright-progress-label">
+                    <?= $block->escapeHtml(__('Order Complete')) ?>
+                </span>
+            </div>
+        </div>
+
+        <!-- Hero -->
+        <section class="cloudright-success-hero">
+
+            <div class="cloudright-success-icon" aria-hidden="true">
+                ✓
+            </div>
+
+            <h1>
+                <?= $block->escapeHtml(
+                    __('Thank you, %1!', $block->getCustomerName())
+                ) ?>
+            </h1>
+
+            <p>
+                <?= $block->escapeHtml(
+                    __('Your order has been successfully placed and your payment has been confirmed.')
+                ) ?>
+            </p>
+
+        </section>
+
+        <!-- Order information -->
+        <section class="cloudright-order-info">
+
+            <div class="cloudright-order-info-card">
+                <span class="cloudright-info-icon">#</span>
+
+                <div>
+                    <span class="cloudright-info-label">
+                        <?= $block->escapeHtml(__('Order Number')) ?>
+                    </span>
+
+                    <strong>
+                        #<?= $block->escapeHtml($block->getOrderNumber()) ?>
+                    </strong>
+                </div>
+            </div>
+
+            <div class="cloudright-order-info-card">
+                <span class="cloudright-info-icon">▣</span>
+
+                <div>
+                    <span class="cloudright-info-label">
+                        <?= $block->escapeHtml(__('Order Date')) ?>
+                    </span>
+
+                    <strong>
+                        <?= $block->escapeHtml($block->getOrderDate()) ?>
+                    </strong>
+                </div>
+            </div>
+
+            <div class="cloudright-order-info-card">
+                <span class="cloudright-info-icon">@</span>
+
+                <div>
+                    <span class="cloudright-info-label">
+                        <?= $block->escapeHtml(__('Confirmation Email')) ?>
+                    </span>
+
+                    <strong>
+                        <?= $block->escapeHtml($block->getCustomerEmail()) ?>
+                    </strong>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Purchase summary -->
+        <section class="cloudright-purchase-summary">
+
+            <div class="cloudright-section-heading">
+                <span>
+                    <?= $block->escapeHtml(__('PURCHASE SUMMARY')) ?>
+                </span>
+            </div>
+
+            <div class="cloudright-summary-card">
+
+                <h2>
+                    <?= $block->escapeHtml(__('Order Details')) ?>
+                </h2>
+
+                <div class="cloudright-order-items">
+
+                    <?php foreach ($block->getOrderItems() as $item): ?>
+
+                        <div class="cloudright-order-item">
+
+                            <div class="cloudright-item-icon">
+                                ◆
+                            </div>
+
+                            <div class="cloudright-item-details">
+
+                                <strong>
+                                    <?= $block->escapeHtml(
+                                        $block->getItemName($item)
+                                    ) ?>
+                                </strong>
+
+                                <span>
+                                    <?= $block->escapeHtml(
+                                        __('Quantity: %1', $block->getItemQty($item))
+                                    ) ?>
+                                </span>
+
+                            </div>
+
+                            <strong class="cloudright-item-price">
+                                <?= $block->escapeHtml(
+                                    $block->getItemPrice($item)
+                                ) ?>
+                            </strong>
+
+                        </div>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+                <div class="cloudright-total-lines">
+
+                    <div class="cloudright-total-row">
+                        <span>
+                            <?= $block->escapeHtml(__('Subtotal')) ?>
+                        </span>
+
+                        <strong>
+                            <?= $block->escapeHtml($block->getSubtotal()) ?>
+                        </strong>
+                    </div>
+
+                    <div class="cloudright-total-row cloudright-grand-total">
+                        <span>
+                            <?= $block->escapeHtml(__('Total')) ?>
+                        </span>
+
+                        <strong>
+                            <?= $block->escapeHtml($block->getGrandTotal()) ?>
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Payment confirmation -->
+        <section class="cloudright-payment-confirmation">
+
+            <div class="cloudright-payment-card">
+
+                <div class="cloudright-payment-row">
+
+                    <span class="cloudright-payment-icon">
+                        ✓
+                    </span>
+
+                    <div>
+                        <span class="cloudright-payment-label">
+                            <?= $block->escapeHtml(__('Payment Method')) ?>
+                        </span>
+
+                        <strong>
+                            <?= $block->escapeHtml(
+                                $block->getPaymentMethodTitle()
+                            ) ?>
+                        </strong>
+                    </div>
+
+                </div>
+
+                <div class="cloudright-payment-status">
+                    <span class="cloudright-status-check">✓</span>
+
+                    <strong>
+                        <?= $block->escapeHtml(__('Paid')) ?>
+                    </strong>
+                </div>
+
+            </div>
+
+            <div class="cloudright-email-confirmation">
+
+                <div class="cloudright-email-icon">
+                    ✉
+                </div>
+
+                <div>
+                    <strong>
+                        <?= $block->escapeHtml(
+                            __('Order confirmation sent')
+                        ) ?>
+                    </strong>
+
+                    <p>
+                        <?= $block->escapeHtml(
+                            __(
+                                'Your order details and confirmation have been sent to %1.',
+                                $block->getCustomerEmail()
+                            )
+                        ) ?>
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Closing message -->
+        <section class="cloudright-success-message">
+
+            <h2>
+                <?= $block->escapeHtml(
+                    __('Thank you for shopping with CloudRight.')
+                ) ?>
+            </h2>
+
+            <p>
+                <?= $block->escapeHtml(
+                    __('We appreciate your order.')
+                ) ?>
+            </p>
+
+        </section>
+
+        <!-- Continue shopping -->
+        <div class="cloudright-success-actions">
+
+            <a
+                class="cloudright-continue-button"
+                href="<?= $block->escapeUrl($block->getContinueUrl()) ?>"
+            >
+                <span>
+                    <?= $block->escapeHtml(__('Continue Shopping')) ?>
+                </span>
+            </a>
+
+        </div>
+
+    <?php else: ?>
+
+        <section class="cloudright-success-empty">
+
+            <h1>
+                <?= $block->escapeHtml(
+                    __('Thank you for your purchase!')
+                ) ?>
+            </h1>
+
+            <p>
+                <?= $block->escapeHtml(
+                    __('Your order has been received.')
+                ) ?>
+            </p>
+
+            <div class="cloudright-success-actions">
+
+                <a
+                    class="cloudright-continue-button"
+                    href="<?= $block->escapeUrl($block->getContinueUrl()) ?>"
+                >
+                    <span>
+                        <?= $block->escapeHtml(__('Continue Shopping')) ?>
+                    </span>
+                </a>
+
+            </div>
+
+        </section>
+
+    <?php endif; ?>
+
+</div>
+

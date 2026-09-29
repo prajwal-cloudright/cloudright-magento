@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!--
+    CloudRight_Payments frontend events.
+
+    No observers are currently required for the base checkout flow.
+    This file is kept in place, valid and empty, so that future
+    event observers (e.g. reacting to order placement or payment
+    status changes) can be registered here without creating a new
+    file or touching Magento core configuration.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+</config>

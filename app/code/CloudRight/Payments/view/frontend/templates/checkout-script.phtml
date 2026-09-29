@@ -1,0 +1,135 @@
+<?php
+/**
+ * CloudRight checkout JS initialization.
+ *
+ * @var \CloudRight\Payments\Block\Checkout $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+
+<script type="text/x-magento-init">
+{
+    "#cloudright-modal-root": {
+        "CloudRight_Payments/js/cloudright-checkout": {
+            "cartApiUrl": "<?= /* @noEscape */ $escaper->escapeJs($block->getCartApiUrl()) ?>",
+            "orderApiUrl": "<?= /* @noEscape */ $escaper->escapeJs($block->getOrderApiUrl()) ?>",
+            "cartPageUrl": "<?= /* @noEscape */ $escaper->escapeJs($block->getCartPageUrl()) ?>",
+            "successPageUrl": "<?= /* @noEscape */ $escaper->escapeJs($block->getSuccessPageUrl()) ?>"
+        }
+    }
+}
+</script>
+
+<script>
+require([
+    'jquery'
+], function ($) {
+    'use strict';
+
+    window.cloudRightOpenCheckout = function () {
+
+        var $modal = $('#cloudright-modal-root');
+
+        if (!$modal.length) {
+            return false;
+        }
+
+        $modal
+            .addClass('is-open')
+            .attr('aria-hidden', 'false')
+            .show();
+
+        $('body').css(
+            'overflow',
+            'hidden'
+        );
+
+        $modal.trigger(
+            'cloudright:open'
+        );
+
+        $.ajax({
+            url: <?= /* @noEscape */ json_encode($block->getCartApiUrl()) ?>,
+            type: 'GET',
+            dataType: 'json',
+            cache: false
+        })
+        .done(function (response) {
+
+            $modal
+                .find('[data-cloudright-summary-items]')
+                .empty();
+
+            if (
+                response &&
+                response.items &&
+                response.items.length
+            ) {
+                $.each(
+                    response.items,
+                    function (index, item) {
+
+                        var rowTotal = '';
+
+                        if (
+                            item.row_total &&
+                            item.row_total.formatted
+                        ) {
+                            rowTotal =
+                                item.row_total.formatted;
+                        }
+
+                        $modal
+                            .find(
+                                '[data-cloudright-summary-items]'
+                            )
+                            .append(
+                                '<div class="cloudright-order-item">' +
+                                    '<div class="cloudright-order-item-info">' +
+                                        '<div class="cloudright-order-item-name">' +
+                                            $('<div>')
+                                                .text(item.name)
+                                                .html() +
+                                        '</div>' +
+                                        '<div class="cloudright-order-item-meta">' +
+                                            'Qty: ' +
+                                            item.qty +
+                                        '</div>' +
+                                    '</div>' +
+                                    '<div class="cloudright-order-item-price">' +
+                                        rowTotal +
+                                    '</div>' +
+                                '</div>'
+                            );
+                    }
+                );
+            }
+
+            if (
+                response &&
+                response.totals &&
+                response.totals.grand_total
+            ) {
+                $modal
+                    .find('[data-cloudright-grand-total]')
+                    .text(
+                        response.totals
+                            .grand_total
+                            .formatted
+                    );
+            }
+
+            $modal
+                .find('[data-cloudright-cart-loading]')
+                .hide();
+
+            $modal
+                .find('[data-cloudright-summary-totals]')
+                .show();
+        });
+
+        return false;
+    };
+});
+</script>
+

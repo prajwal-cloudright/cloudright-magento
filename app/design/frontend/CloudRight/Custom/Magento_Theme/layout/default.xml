@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+
+    <head>
+        <css src="css/homepage.css"/>
+    </head>
+
+    <body>
+
+        <!-- =====================================================
+             REMOVE DEFAULT LUMA BREADCRUMBS
+             ===================================================== -->
+
+        <referenceBlock name="breadcrumbs" remove="true"/>
+
+
+        <!-- =====================================================
+             REMOVE DEFAULT LUMA HEADER
+             ===================================================== -->
+
+        <referenceBlock name="header-wrapper" remove="true"/>
+        <referenceBlock name="header.links" remove="true"/>
+        <referenceBlock name="skip_to_content" remove="true"/>
+        <referenceBlock name="top.links" remove="true"/>
+        <referenceBlock name="store.menu" remove="true"/>
+        <referenceBlock name="navigation.sections" remove="true"/>
+        <referenceBlock name="catalog.topnav" remove="true"/>
+        <referenceBlock name="minicart" remove="true"/>
+        <referenceBlock name="search" remove="true"/>
+        <referenceBlock name="logo" remove="true"/>
+        <referenceBlock name="top.search" remove="true"/>
+
+
+        <!-- =====================================================
+             CLOUDRIGHT HEADER
+             ===================================================== -->
+
+        <referenceContainer name="header.container">
+
+            <container name="cloudright.header"
+                       htmlTag="header"
+                       htmlClass="cloudright-header"
+                       before="-">
+
+                <block class="Magento\Framework\View\Element\Template"
+                       name="cloudright.header.template"
+                       template="Magento_Theme::html/cloudright-header.phtml"/>
+
+            </container>
+
+        </referenceContainer>
+
+
+        <!-- =====================================================
+             REMOVE DEFAULT LUMA FOOTER
+             ===================================================== -->
+
+        <referenceBlock name="footer_links" remove="true"/>
+        <referenceBlock name="footer_links2" remove="true"/>
+        <referenceBlock name="footer" remove="true"/>
+        <referenceBlock name="footer-content" remove="true"/>
+        <referenceBlock name="form.subscribe" remove="true"/>
+        <referenceBlock name="newsletter.subscribe" remove="true"/>
+
+
+        <!-- =====================================================
+             CLOUDRIGHT FOOTER
+             ===================================================== -->
+
+        <referenceContainer name="footer-container">
+
+            <container name="cloudright.footer"
+                       htmlTag="footer"
+                       htmlClass="cloudright-footer">
+
+                <block class="Magento\Framework\View\Element\Template"
+                       name="cloudright.footer.template"
+                       template="Magento_Theme::html/cloudright-footer.phtml"/>
+
+            </container>
+
+        </referenceContainer>
+
+    </body>
+</page>
+

@@ -1,0 +1,64 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+?>
+
+<div class="cloudright-header-top">
+    <div class="cloudright-header-inner">
+
+        <a href="<?= $block->getUrl('') ?>" class="cloudright-logo">
+            <span class="cloudright-logo-mark">C</span>
+            <span class="cloudright-logo-text">CloudRight</span>
+        </a>
+
+        <div class="cloudright-search">
+            <form action="<?= $block->getUrl('catalogsearch/result') ?>" method="get">
+                <input
+                    type="text"
+                    name="q"
+                    placeholder="Search for products, brands and more..."
+                    aria-label="Search"
+                >
+                <button type="submit" aria-label="Search">
+                    🔍
+                </button>
+            </form>
+        </div>
+
+        <div class="cloudright-header-actions">
+
+            <a href="<?= $block->getUrl('customer/account/login') ?>"
+               class="cloudright-header-link">
+                <span class="cloudright-action-icon">👤</span>
+                <span>
+                    <small>Hello, Sign in</small>
+                    <strong>Account</strong>
+                </span>
+            </a>
+
+            <a href="<?= $block->getUrl('checkout/cart') ?>"
+               class="cloudright-header-link cloudright-cart-link">
+                <span class="cloudright-action-icon">🛒</span>
+                <span>
+                    <small>Your</small>
+                    <strong>Cart</strong>
+                </span>
+            </a>
+
+        </div>
+
+    </div>
+</div>
+
+<nav class="cloudright-nav">
+    <div class="cloudright-nav-inner">
+
+        <a href="<?= $block->getUrl('') ?>">Home</a>
+        <a href="#">Electronics</a>
+        <a href="#">Fashion</a>
+        <a href="#">Home & Living</a>
+        <a href="#">Accessories</a>
+        <a href="#">Deals</a>
+
+    </div>
+</nav>
+
