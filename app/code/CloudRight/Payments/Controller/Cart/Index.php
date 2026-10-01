@@ -10,6 +10,7 @@ namespace CloudRight\Payments\Controller\Cart;
 
 use Magento\Catalog\Helper\Image as CatalogImageHelper;
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\CsrfAwareActionInterface;
@@ -26,8 +27,7 @@ use Psr\Log\LoggerInterface;
  * GET /cloudright/cart
  *
  * Returns the current Magento quote (guest or logged-in) as JSON for the
- * CloudRight checkout modal. Reads exclusively through Magento's own
- * checkout session / quote services - no direct database access.
+ * CloudRight checkout modal.
  */
 class Index implements HttpGetActionInterface, CsrfAwareActionInterface
 {
@@ -35,6 +35,11 @@ class Index implements HttpGetActionInterface, CsrfAwareActionInterface
      * @var CheckoutSession
      */
     private CheckoutSession $checkoutSession;
+
+    /**
+     * @var CustomerSession
+     */
+    private CustomerSession $customerSession;
 
     /**
      * @var JsonFactory
@@ -59,6 +64,7 @@ class Index implements HttpGetActionInterface, CsrfAwareActionInterface
     /**
      * @param Context $context
      * @param CheckoutSession $checkoutSession
+     * @param CustomerSession $customerSession
      * @param JsonFactory $jsonFactory
      * @param PricingHelper $pricingHelper
      * @param CatalogImageHelper $imageHelper
@@ -67,12 +73,14 @@ class Index implements HttpGetActionInterface, CsrfAwareActionInterface
     public function __construct(
         Context $context,
         CheckoutSession $checkoutSession,
+        CustomerSession $customerSession,
         JsonFactory $jsonFactory,
         PricingHelper $pricingHelper,
         CatalogImageHelper $imageHelper,
         LoggerInterface $logger
     ) {
         $this->checkoutSession = $checkoutSession;
+        $this->customerSession = $customerSession;
         $this->jsonFactory = $jsonFactory;
         $this->pricingHelper = $pricingHelper;
         $this->imageHelper = $imageHelper;
@@ -90,14 +98,23 @@ class Index implements HttpGetActionInterface, CsrfAwareActionInterface
         try {
             $quote = $this->checkoutSession->getQuote();
 
-            return $result->setData($this->buildCartPayload($quote));
+            return $result->setData(
+                $this->buildCartPayload($quote)
+            );
         } catch (\Exception $e) {
-            $this->logger->error('CloudRight: failed to build cart payload.', ['exception' => $e]);
+            $this->logger->error(
+                'CloudRight: failed to build cart payload.',
+                ['exception' => $e]
+            );
 
-            return $result->setHttpResponseCode(500)->setData([
-                'success' => false,
-                'message' => __('Unable to load your cart right now. Please try again.'),
-            ]);
+            return $result
+                ->setHttpResponseCode(500)
+                ->setData([
+                    'success' => false,
+                    'message' => __(
+                        'Unable to load your cart right now. Please try again.'
+                    ),
+                ]);
         }
     }
 
@@ -105,30 +122,96 @@ class Index implements HttpGetActionInterface, CsrfAwareActionInterface
      * @param CartInterface $quote
      * @return array
      */
-    private function buildCartPayload(CartInterface $quote): array
-    {
+    private function buildCartPayload(
+        CartInterface $quote
+    ): array {
         $items = [];
-        foreach ($quote->getAllVisibleItems() as $item) {
-            $items[] = $this->buildItemPayload($item);
+
+        foreach (
+            $quote->getAllVisibleItems()
+            as $item
+        ) {
+            $items[] =
+                $this->buildItemPayload($item);
         }
 
-        $subtotal = (float)$quote->getSubtotal();
+        $subtotal =
+            (float)$quote->getSubtotal();
+
         $shippingAmount = 0.0;
-        $shippingAddress = $quote->isVirtual() ? null : $quote->getShippingAddress();
+
+        $shippingAddress =
+            $quote->isVirtual()
+                ? null
+                : $quote->getShippingAddress();
+
         if ($shippingAddress) {
-            $shippingAmount = (float)$shippingAddress->getShippingAmount();
+            $shippingAmount =
+                (float)$shippingAddress->getShippingAmount();
         }
-        $grandTotal = (float)$quote->getGrandTotal();
+
+        $grandTotal =
+            (float)$quote->getGrandTotal();
 
         return [
             'success' => true,
+
+            'customer' =>
+                $this->buildCustomerPayload(),
+
             'items' => $items,
-            'item_count' => count($items),
+
+            'item_count' =>
+                count($items),
+
             'totals' => [
-                'subtotal' => $this->formatMoney($subtotal),
-                'shipping' => $this->formatMoney($shippingAmount),
-                'grand_total' => $this->formatMoney($grandTotal),
+                'subtotal' =>
+                    $this->formatMoney($subtotal),
+
+                'shipping' =>
+                    $this->formatMoney($shippingAmount),
+
+                'grand_total' =>
+                    $this->formatMoney($grandTotal),
             ],
+        ];
+    }
+
+    /**
+     * Return the currently authenticated Magento customer.
+     *
+     * @return array|null
+     */
+    private function buildCustomerPayload(): ?array
+    {
+        if (!$this->customerSession->isLoggedIn()) {
+            return null;
+        }
+
+        $customer = $this->customerSession->getCustomer();
+
+        if (!$customer || !$customer->getId()) {
+            return null;
+        }
+
+        return [
+            'id' => (int)$customer->getId(),
+
+            'email' =>
+                (string)$customer->getEmail(),
+
+            'name' =>
+                trim(
+                    (string)$customer->getFirstname() .
+                    ' ' .
+                    (string)$customer->getLastname()
+                ),
+
+            'firstname' =>
+                (string)$customer->getFirstname(),
+
+            'lastname' =>
+                (string)$customer->getLastname(),
         ];
     }
 
@@ -136,29 +219,56 @@ class Index implements HttpGetActionInterface, CsrfAwareActionInterface
      * @param QuoteItem $item
      * @return array
      */
-    private function buildItemPayload(QuoteItem $item): array
-    {
+    private function buildItemPayload(
+        QuoteItem $item
+    ): array {
         $imageUrl = '';
+
         try {
-            $product = $item->getProduct();
+            $product =
+                $item->getProduct();
+
             if ($product) {
-                $imageUrl = (string)$this->imageHelper
-                    ->init($product, 'cart_page_product_thumbnail')
-                    ->getUrl();
+                $imageUrl =
+                    (string)$this->imageHelper
+                        ->init(
+                            $product,
+                            'cart_page_product_thumbnail'
+                        )
+                        ->getUrl();
             }
         } catch (\Exception $e) {
             $imageUrl = '';
         }
 
         return [
-            'item_id' => (int)$item->getItemId(),
-            'product_id' => (int)$item->getProductId(),
-            'sku' => (string)$item->getSku(),
-            'name' => (string)$item->getName(),
-            'qty' => (float)$item->getQty(),
-            'price' => $this->formatMoney((float)$item->getPrice()),
-            'row_total' => $this->formatMoney((float)$item->getRowTotal()),
-            'image_url' => $imageUrl,
+            'item_id' =>
+                (int)$item->getItemId(),
+
+            'product_id' =>
+                (int)$item->getProductId(),
+
+            'sku' =>
+                (string)$item->getSku(),
+
+            'name' =>
+                (string)$item->getName(),
+
+            'qty' =>
+                (float)$item->getQty(),
+
+            'price' =>
+                $this->formatMoney(
+                    (float)$item->getPrice()
+                ),
+
+            'row_total' =>
+                $this->formatMoney(
+                    (float)$item->getRowTotal()
+                ),
+
+            'image_url' =>
+                $imageUrl,
         ];
     }
 
@@ -166,27 +276,38 @@ class Index implements HttpGetActionInterface, CsrfAwareActionInterface
      * @param float $amount
      * @return array
      */
-    private function formatMoney(float $amount): array
-    {
+    private function formatMoney(
+        float $amount
+    ): array {
         return [
-            'value' => round($amount, 2),
-            'formatted' => $this->pricingHelper->currency($amount, true, false),
+            'value' =>
+                round($amount, 2),
+
+            'formatted' =>
+                $this->pricingHelper->currency(
+                    $amount,
+                    true,
+                    false
+                ),
         ];
     }
 
     /**
      * @inheritDoc
      */
-    public function createCsrfValidationException(RequestInterface $request): ?InvalidRequestException
-    {
+    public function createCsrfValidationException(
+        RequestInterface $request
+    ): ?InvalidRequestException {
         return null;
     }
 
     /**
      * @inheritDoc
      */
-    public function validateForCsrf(RequestInterface $request): ?bool
-    {
+    public function validateForCsrf(
+        RequestInterface $request
+    ): ?bool {
         return true;
     }
 }
+

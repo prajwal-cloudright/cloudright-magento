@@ -1,0 +1,55 @@
+<?php
+/**
+ * CloudRight Product Details
+ *
+ * @var \Magento\Catalog\Block\Product\View\Details $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+$product = $block->getProduct();
+?>
+
+<div class="cloudright-product-details">
+
+    <?php foreach ($block->getGroupSortedChildNames('detailed_info', '') as $childName): ?>
+
+        <?php
+        $childBlock = $block->getChildBlock('detailed_info', $childName);
+
+        if (!$childBlock) {
+            continue;
+        }
+
+        $alias = $childBlock->getAlias();
+        $html = $block->getChildData('detailed_info', $alias);
+        $title = $childBlock->getTitle();
+        ?>
+
+        <?php if ($html): ?>
+
+            <section class="cloudright-detail-section">
+
+                <?php if ($title): ?>
+
+                    <div class="cloudright-detail-heading">
+                        <span class="cloudright-detail-line"></span>
+
+                        <h2>
+                            <?= $escaper->escapeHtml($title) ?>
+                        </h2>
+                    </div>
+
+                <?php endif; ?>
+
+                <div class="cloudright-detail-content">
+                    <?= /* @noEscape */ $html ?>
+                </div>
+
+            </section>
+
+        <?php endif; ?>
+
+    <?php endforeach; ?>
+
+</div>
+

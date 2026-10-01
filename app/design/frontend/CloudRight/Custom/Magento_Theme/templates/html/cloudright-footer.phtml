@@ -1,0 +1,107 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+?>
+
+<div class="cloudright-footer-inner">
+
+    <!-- =====================================================
+         FOOTER MAIN
+         ===================================================== -->
+
+    <div class="cloudright-footer-main">
+
+        <!-- Brand -->
+        <div class="cloudright-footer-column cloudright-footer-brand">
+
+            <a href="<?= $block->getUrl('') ?>" class="cloudright-footer-logo">
+                <span class="cloudright-footer-logo-mark">C</span>
+                <span>CloudRight</span>
+            </a>
+
+            <p>
+                Discover quality products at great prices with a
+                simple, secure and reliable shopping experience.
+            </p>
+
+            <div class="cloudright-footer-contact">
+                <span>📧</span>
+                <span>support@cloudright.com</span>
+            </div>
+
+        </div>
+
+
+        <!-- Shop -->
+        <div class="cloudright-footer-column">
+
+            <h3>Shop</h3>
+
+            <a href="#">Electronics</a>
+            <a href="#">Fashion</a>
+            <a href="#">Home &amp; Living</a>
+            <a href="#">Accessories</a>
+            <a href="#">Deals</a>
+
+        </div>
+
+
+        <!-- Customer Service -->
+        <div class="cloudright-footer-column">
+
+            <h3>Customer Service</h3>
+
+            <a href="#">Contact Us</a>
+            <a href="#">Shipping Information</a>
+            <a href="#">Returns &amp; Refunds</a>
+            <a href="#">FAQ</a>
+            <a href="#">Help Center</a>
+
+        </div>
+
+
+        <!-- Account -->
+        <div class="cloudright-footer-column">
+
+            <h3>My Account</h3>
+
+            <a href="<?= $block->getUrl('customer/account/login') ?>">
+                Sign In
+            </a>
+
+            <a href="<?= $block->getUrl('customer/account/create') ?>">
+                Create Account
+            </a>
+
+            <a href="<?= $block->getUrl('checkout/cart') ?>">
+                My Cart
+            </a>
+
+            <a href="<?= $block->getUrl('sales/order/history') ?>">
+                My Orders
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FOOTER BOTTOM
+         ===================================================== -->
+
+    <div class="cloudright-footer-bottom">
+
+        <div class="cloudright-footer-copyright">
+            © <?= date('Y') ?> CloudRight. All rights reserved.
+        </div>
+
+        <div class="cloudright-footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms &amp; Conditions</a>
+            <a href="#">Refund Policy</a>
+        </div>
+
+    </div>
+
+</div>
+

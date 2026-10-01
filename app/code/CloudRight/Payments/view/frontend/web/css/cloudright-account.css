@@ -1,0 +1,191 @@
+/* =========================================================
+   CLOUDRIGHT ACCOUNT PAGE
+   ========================================================= */
+
+.cloudright-account-page {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 50px 24px 70px;
+    box-sizing: border-box;
+}
+
+.cloudright-account-card {
+    width: 100%;
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 34px;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1px solid #e2e7ee;
+    border-radius: 14px;
+    box-shadow: 0 5px 20px rgba(15, 23, 42, 0.06);
+}
+
+.cloudright-account-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 26px;
+    margin-bottom: 26px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.cloudright-account-icon {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #eef5ff;
+    font-size: 24px;
+}
+
+.cloudright-account-header h1 {
+    margin: 0 0 5px;
+    color: #111827;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.cloudright-account-header p {
+    margin: 0;
+    color: #667085;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.cloudright-account-details {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.cloudright-account-detail {
+    padding: 18px 20px;
+    background: #f8fafc;
+    border: 1px solid #e7ebf0;
+    border-radius: 10px;
+}
+
+.cloudright-account-label {
+    display: block;
+    margin-bottom: 7px;
+    color: #667085;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cloudright-account-value {
+    display: block;
+    color: #111827;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.cloudright-account-login-message {
+    margin-bottom: 22px;
+}
+
+.cloudright-account-login-message h2 {
+    margin: 0 0 8px;
+    color: #111827;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.cloudright-account-login-message p {
+    margin: 0;
+    color: #667085;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.cloudright-account-actions {
+    margin-top: 24px;
+}
+
+.cloudright-account-button {
+    width: 100%;
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 12px 20px;
+    border: 0;
+    border-radius: 8px;
+    background: #1769d1;
+    color: #ffffff !important;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
+    text-decoration: none !important;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.cloudright-account-button:hover {
+    background: #1258b1;
+    color: #ffffff !important;
+    text-decoration: none !important;
+    transform: translateY(-1px);
+}
+
+.cloudright-account-button:focus {
+    outline: 2px solid #1769d1;
+    outline-offset: 2px;
+}
+
+.cloudright-account-logout {
+    background: #1769d1;
+}
+
+.cloudright-account-logout:hover {
+    background: #1258b1;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 640px) {
+
+    .cloudright-account-page {
+        padding: 30px 16px 50px;
+    }
+
+    .cloudright-account-card {
+        padding: 24px 20px;
+        border-radius: 12px;
+    }
+
+    .cloudright-account-header h1 {
+        font-size: 22px;
+    }
+
+    .cloudright-account-icon {
+        width: 46px;
+        height: 46px;
+        font-size: 21px;
+    }
+
+}
+
+
+/* =========================================================
+   HIDDEN ACCOUNT SECTIONS
+   ========================================================= */
+
+.cloudright-account-page [hidden] {
+    display: none !important;
+}
+

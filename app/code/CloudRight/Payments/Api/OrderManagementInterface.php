@@ -13,21 +13,45 @@ use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
 
 /**
- * Service contract responsible for turning the current CloudRight
- * checkout (customer email + CloudRight transaction id) into a real
- * Magento order, using Magento's own quote/order APIs.
+ * Service contract responsible for turning CloudRight checkout
+ * information into a Magento order.
  */
 interface OrderManagementInterface
 {
     /**
-     * Create a Magento order for the current quote/cart using the
-     * CloudRight checkout data collected on the storefront.
+     * Create a Magento order for the current storefront quote/cart.
      *
-     * @param string $email Customer email captured in the CloudRight checkout modal.
-     * @param string $transactionId CloudRight transaction identifier (test/dev transaction id for now).
+     * This method is used by the existing CloudRight storefront
+     * checkout and relies on the Magento checkout session.
+     *
+     * @param string $email
+     * @param string $transactionId
      * @return \CloudRight\Payments\Api\Data\OrderResultInterface
-     * @throws LocalizedException When the request is invalid (bad email, missing transaction id, empty cart).
-     * @throws CouldNotSaveException When the order could not be created/saved.
+     * @throws LocalizedException
+     * @throws CouldNotSaveException
      */
-    public function createOrder(string $email, string $transactionId): OrderResultInterface;
+    public function createOrder(
+        string $email,
+        string $transactionId
+    ): OrderResultInterface;
+
+    /**
+     * Create a Magento order for a specific masked cart.
+     *
+     * This method is intended for authenticated REST API clients.
+     * The cartId is Magento's masked cart identifier and does not
+     * expose the internal quote ID.
+     *
+     * @param string $cartId
+     * @param string $email
+     * @param string $transactionId
+     * @return \CloudRight\Payments\Api\Data\OrderResultInterface
+     * @throws LocalizedException
+     * @throws CouldNotSaveException
+     */
+    public function createOrderForCart(
+        string $cartId,
+        string $email,
+        string $transactionId
+    ): OrderResultInterface;
 }

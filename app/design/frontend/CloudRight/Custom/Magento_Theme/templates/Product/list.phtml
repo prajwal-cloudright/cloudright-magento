@@ -1,0 +1,182 @@
+<script>
+(function () {
+    'use strict';
+
+    function startCartAnimation(button) {
+
+        var productCard = button.closest(
+            '.cloudright-product-card'
+        );
+
+        if (!productCard) {
+            return;
+        }
+
+        var productImage = productCard.querySelector(
+            '.cloudright-product-image img'
+        );
+
+        var cartLink = document.querySelector(
+            '.cloudright-cart-link'
+        );
+
+        if (!productImage || !cartLink) {
+            return;
+        }
+
+        var imageRect =
+            productImage.getBoundingClientRect();
+
+        var cartRect =
+            cartLink.getBoundingClientRect();
+
+        if (
+            imageRect.width <= 0 ||
+            imageRect.height <= 0 ||
+            cartRect.width <= 0 ||
+            cartRect.height <= 0
+        ) {
+            return;
+        }
+
+        var flyingImage =
+            document.createElement('img');
+
+        flyingImage.src =
+            productImage.currentSrc ||
+            productImage.src;
+
+        flyingImage.setAttribute(
+            'aria-hidden',
+            'true'
+        );
+
+        flyingImage.style.position = 'fixed';
+        flyingImage.style.left =
+            imageRect.left + 'px';
+
+        flyingImage.style.top =
+            imageRect.top + 'px';
+
+        flyingImage.style.width =
+            imageRect.width + 'px';
+
+        flyingImage.style.height =
+            imageRect.height + 'px';
+
+        flyingImage.style.zIndex =
+            '2147483647';
+
+        flyingImage.style.pointerEvents =
+            'none';
+
+        flyingImage.style.objectFit =
+            'contain';
+
+        flyingImage.style.margin =
+            '0';
+
+        flyingImage.style.padding =
+            '0';
+
+        flyingImage.style.border =
+            '0';
+
+        flyingImage.style.borderRadius =
+            '12px';
+
+        flyingImage.style.opacity =
+            '1';
+
+        flyingImage.style.transform =
+            'scale(1) rotate(0deg)';
+
+        flyingImage.style.transition =
+            'all 0.65s cubic-bezier(0.22, 1, 0.36, 1)';
+
+        document.body.appendChild(
+            flyingImage
+        );
+
+        /*
+         * Force browser to render the
+         * starting position.
+         */
+        flyingImage.offsetWidth;
+
+        var targetSize = 38;
+
+        var targetLeft =
+            cartRect.left +
+            (cartRect.width / 2) -
+            (targetSize / 2);
+
+        var targetTop =
+            cartRect.top +
+            (cartRect.height / 2) -
+            (targetSize / 2);
+
+        flyingImage.style.left =
+            targetLeft + 'px';
+
+        flyingImage.style.top =
+            targetTop + 'px';
+
+        flyingImage.style.width =
+            targetSize + 'px';
+
+        flyingImage.style.height =
+            targetSize + 'px';
+
+        flyingImage.style.opacity =
+            '0';
+
+        flyingImage.style.transform =
+            'scale(0.15) rotate(360deg)';
+
+        setTimeout(function () {
+
+            if (flyingImage.parentNode) {
+                flyingImage.parentNode.removeChild(
+                    flyingImage
+                );
+            }
+
+        }, 700);
+    }
+
+
+    /*
+     * Capture the Add to Cart click.
+     *
+     * We intentionally do NOT call:
+     * preventDefault()
+     *
+     * Therefore Magento's normal Add to Cart
+     * process continues exactly as before.
+     */
+    document.addEventListener(
+        'click',
+        function (event) {
+
+            var button =
+                event.target.closest(
+                    '.cloudright-add-to-cart'
+                );
+
+            if (!button) {
+                return;
+            }
+
+            if (button.disabled) {
+                return;
+            }
+
+            startCartAnimation(button);
+
+        },
+        true
+    );
+
+})();
+</script>

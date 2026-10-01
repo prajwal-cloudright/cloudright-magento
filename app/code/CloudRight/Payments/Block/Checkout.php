@@ -15,8 +15,7 @@ use Magento\Store\Model\StoreManagerInterface;
 /**
  * View block for the CloudRight checkout modal rendered on top of the
  * Magento cart page. Holds only presentation/wiring logic (API URLs,
- * static asset URL, module version) - no business logic. All business
- * logic lives in the CloudRight\Payments\Model and Api namespaces.
+ * static asset URL, module version) - no business logic.
  */
 class Checkout extends Template
 {
@@ -40,7 +39,7 @@ class Checkout extends Template
     }
 
     /**
-     * Frontend URL of the cart data endpoint (GET /cloudright/cart).
+     * Frontend URL of the cart data endpoint.
      *
      * @return string
      */
@@ -53,8 +52,7 @@ class Checkout extends Template
     }
 
     /**
-     * Frontend URL of the order creation endpoint
-     * (POST /cloudright/payment/process).
+     * Frontend URL of the order creation endpoint.
      *
      * @return string
      */
@@ -62,6 +60,19 @@ class Checkout extends Template
     {
         return $this->getUrl(
             'cloudright/payment/process',
+            ['_secure' => $this->_isSecure()]
+        );
+    }
+
+    /**
+     * Frontend URL of the customer creation endpoint.
+     *
+     * @return string
+     */
+    public function getCustomerApiUrl(): string
+    {
+        return $this->getUrl(
+            'cloudright/customer/create',
             ['_secure' => $this->_isSecure()]
         );
     }
@@ -98,10 +109,11 @@ class Checkout extends Template
     private function _isSecure(): bool
     {
         try {
-            return (bool)$this->storeManager->getStore()->isCurrentlySecure();
+            return (bool)$this->storeManager
+                ->getStore()
+                ->isCurrentlySecure();
         } catch (\Exception $e) {
             return false;
         }
     }
 }
-

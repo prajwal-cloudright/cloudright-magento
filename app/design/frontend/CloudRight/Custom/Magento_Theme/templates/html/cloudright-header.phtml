@@ -1,5 +1,5 @@
 <?php
-/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Magento\Checkout\Block\Cart\Sidebar $block */
 ?>
 
 <div class="cloudright-header-top">
@@ -26,9 +26,10 @@
 
         <div class="cloudright-header-actions">
 
-            <a href="<?= $block->getUrl('customer/account/login') ?>"
+            <a href="<?= $block->getUrl('cloudright/account') ?>"
                class="cloudright-header-link">
                 <span class="cloudright-action-icon">👤</span>
+
                 <span>
                     <small>Hello, Sign in</small>
                     <strong>Account</strong>
@@ -37,11 +38,27 @@
 
             <a href="<?= $block->getUrl('checkout/cart') ?>"
                class="cloudright-header-link cloudright-cart-link">
-                <span class="cloudright-action-icon">🛒</span>
+
+                <span class="cloudright-cart-icon-wrapper">
+
+                    <span class="cloudright-action-icon">
+                        🛒
+                    </span>
+
+                    <span
+                        class="cloudright-cart-count"
+                        data-cloudright-cart-count
+                    >
+                        0
+                    </span>
+
+                </span>
+
                 <span>
                     <small>Your</small>
                     <strong>Cart</strong>
                 </span>
+
             </a>
 
         </div>
@@ -52,13 +69,55 @@
 <nav class="cloudright-nav">
     <div class="cloudright-nav-inner">
 
-        <a href="<?= $block->getUrl('') ?>">Home</a>
-        <a href="#">Electronics</a>
-        <a href="#">Fashion</a>
-        <a href="#">Home & Living</a>
-        <a href="#">Accessories</a>
-        <a href="#">Deals</a>
+        <a href="<?= $block->getUrl('') ?>">
+            Home
+        </a>
+
+        <a href="<?= $block->getUrl('catalog/category/view', ['id' => 3]) ?>">
+            Smart Phones
+        </a>
+
+        <a href="<?= $block->getUrl('catalog/category/view', ['id' => 4]) ?>">
+            Laptops
+        </a>
+
+        <a href="<?= $block->getUrl('catalog/category/view', ['id' => 5]) ?>">
+            Watches
+        </a>
 
     </div>
 </nav>
+
+<script>
+require([
+    'Magento_Customer/js/customer-data'
+], function (customerData) {
+
+    var cartData = customerData.get('cart');
+
+    function updateCartCount() {
+
+        var cart = cartData();
+        var count = 0;
+
+        if (cart && cart.summary_count) {
+            count = parseInt(cart.summary_count, 10) || 0;
+        }
+
+        var cartCount = document.querySelector(
+            '[data-cloudright-cart-count]'
+        );
+
+        if (cartCount) {
+            cartCount.textContent = count;
+        }
+    }
+
+    updateCartCount();
+
+    cartData.subscribe(function () {
+        updateCartCount();
+    });
+});
+</script>
 

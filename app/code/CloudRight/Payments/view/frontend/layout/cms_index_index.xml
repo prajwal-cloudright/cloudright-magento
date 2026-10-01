@@ -19,11 +19,6 @@
                    template="CloudRight_Payments::checkout-script.phtml"
                    after="cloudright.checkout.home.modal"/>
 
-            <block class="CloudRight\Payments\Block\Checkout"
-                   name="cloudright.custom.home.button"
-                   template="CloudRight_Payments::custom-checkout-button.phtml"
-                   after="cloudright.checkout.home.script"/>
-
         </referenceContainer>
 
     </body>

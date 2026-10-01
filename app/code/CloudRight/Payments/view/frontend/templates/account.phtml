@@ -1,0 +1,418 @@
+<?php
+/**
+ * CloudRight customer account page.
+ *
+ * @var \CloudRight\Payments\Block\Account $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+
+<div class="cloudright-account-page">
+
+    <div class="cloudright-account-card">
+
+        <div class="cloudright-account-header">
+
+            <div class="cloudright-account-icon">
+                👤
+            </div>
+
+            <div>
+                <h1>My Account</h1>
+
+                <p data-cloudright-account-subtitle>
+                    Sign in to continue.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div
+            class="cloudright-account-login"
+            data-cloudright-account-login
+        >
+
+            <div class="cloudright-account-login-message">
+
+                <h2>Sign in to your account</h2>
+
+                <p>
+                    Enter your email address to continue with CloudRight.
+                </p>
+
+            </div>
+
+
+            <form
+                data-cloudright-account-form
+                novalidate
+            >
+
+                <div class="cloudright-account-field">
+
+                    <label for="cloudright-account-email">
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="cloudright-account-email"
+                        name="email"
+                        placeholder="Enter your email address"
+                        autocomplete="email"
+                        data-cloudright-account-email
+                    >
+
+                    <div
+                        class="cloudright-account-error"
+                        data-cloudright-account-error
+                        hidden
+                    ></div>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="cloudright-account-button"
+                    data-cloudright-account-login-button
+                >
+                    <span>Login</span>
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <div
+            class="cloudright-account-details"
+            data-cloudright-account-details
+            hidden
+        >
+
+            <div class="cloudright-account-detail">
+
+                <span class="cloudright-account-label">
+                    Email Address
+                </span>
+
+                <strong
+                    class="cloudright-account-value"
+                    data-cloudright-account-email-value
+                >
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="cloudright-account-actions">
+
+                <button
+                    type="button"
+                    class="cloudright-account-button cloudright-account-logout"
+                    data-cloudright-account-logout
+                >
+                    Logout
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+require([], function () {
+    'use strict';
+
+    var STORAGE_KEY = 'cloudright_customer';
+
+    var loginSection = document.querySelector(
+        '[data-cloudright-account-login]'
+    );
+
+    var detailsSection = document.querySelector(
+        '[data-cloudright-account-details]'
+    );
+
+    var form = document.querySelector(
+        '[data-cloudright-account-form]'
+    );
+
+    var emailInput = document.querySelector(
+        '[data-cloudright-account-email]'
+    );
+
+    var emailValue = document.querySelector(
+        '[data-cloudright-account-email-value]'
+    );
+
+    var errorElement = document.querySelector(
+        '[data-cloudright-account-error]'
+    );
+
+    var logoutButton = document.querySelector(
+        '[data-cloudright-account-logout]'
+    );
+
+    var subtitle = document.querySelector(
+        '[data-cloudright-account-subtitle]'
+    );
+
+
+    function getCustomer() {
+
+        try {
+
+            var value =
+                window.localStorage.getItem(STORAGE_KEY);
+
+            if (!value) {
+                return null;
+            }
+
+            var customer = JSON.parse(value);
+
+            if (
+                customer &&
+                customer.email
+            ) {
+                return customer;
+            }
+
+        } catch (error) {
+            // Ignore invalid localStorage data.
+        }
+
+        return null;
+    }
+
+
+    function saveCustomer(email) {
+
+        var customer = {
+            email: email
+        };
+
+        try {
+
+            window.localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(customer)
+            );
+
+        } catch (error) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    function clearCustomer() {
+
+        try {
+
+            window.localStorage.removeItem(
+                STORAGE_KEY
+            );
+
+        } catch (error) {
+            // Ignore localStorage failures.
+        }
+    }
+
+
+    function showError(message) {
+
+        if (!errorElement) {
+            return;
+        }
+
+        errorElement.textContent = message;
+        errorElement.removeAttribute('hidden');
+    }
+
+
+    function hideError() {
+
+        if (!errorElement) {
+            return;
+        }
+
+        errorElement.textContent = '';
+
+        errorElement.setAttribute(
+            'hidden',
+            'hidden'
+        );
+    }
+
+
+    function showLoggedOut() {
+
+        if (loginSection) {
+            loginSection.removeAttribute('hidden');
+        }
+
+        if (detailsSection) {
+            detailsSection.setAttribute(
+                'hidden',
+                'hidden'
+            );
+        }
+
+        if (subtitle) {
+            subtitle.textContent =
+                'Sign in to continue.';
+        }
+
+        hideError();
+
+        if (emailInput) {
+            emailInput.value = '';
+        }
+    }
+
+
+    function showLoggedIn(customer) {
+
+        if (!customer || !customer.email) {
+            showLoggedOut();
+            return;
+        }
+
+        if (loginSection) {
+            loginSection.setAttribute(
+                'hidden',
+                'hidden'
+            );
+        }
+
+        if (detailsSection) {
+            detailsSection.removeAttribute('hidden');
+        }
+
+        if (emailValue) {
+            emailValue.textContent =
+                customer.email;
+        }
+
+        if (subtitle) {
+            subtitle.textContent =
+                'You are signed in to CloudRight.';
+        }
+
+        hideError();
+    }
+
+
+    function loadCustomer() {
+
+        var customer = getCustomer();
+
+        if (customer) {
+            showLoggedIn(customer);
+        } else {
+            showLoggedOut();
+        }
+    }
+
+
+    if (form) {
+
+        form.addEventListener(
+            'submit',
+            function (event) {
+
+                event.preventDefault();
+
+                hideError();
+
+                var email =
+                    emailInput
+                        ? emailInput.value.trim()
+                        : '';
+
+                if (!email) {
+
+                    showError(
+                        'Please enter your email address.'
+                    );
+
+                    return;
+                }
+
+
+                var emailPattern =
+                    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                if (!emailPattern.test(email)) {
+
+                    showError(
+                        'Please enter a valid email address.'
+                    );
+
+                    return;
+                }
+
+
+                if (!saveCustomer(email)) {
+
+                    showError(
+                        'Unable to save your account information. Please try again.'
+                    );
+
+                    return;
+                }
+
+
+                showLoggedIn({
+                    email: email
+                });
+
+            }
+        );
+
+    }
+
+
+    if (logoutButton) {
+
+        logoutButton.addEventListener(
+            'click',
+            function () {
+
+                clearCustomer();
+
+                showLoggedOut();
+
+            }
+        );
+
+    }
+
+
+    window.addEventListener(
+        'storage',
+        function (event) {
+
+            if (event.key === STORAGE_KEY) {
+                loadCustomer();
+            }
+
+        }
+    );
+
+
+    loadCustomer();
+
+});
+</script>
+

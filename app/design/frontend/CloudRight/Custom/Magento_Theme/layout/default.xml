@@ -4,21 +4,18 @@
 
     <head>
         <css src="css/homepage.css"/>
+        <css src="css/category.css"/>
+        <css src="css/cloudright-cart-animation.css"/>
+
+        <script src="js/cloudright-cart-animation.js"/>
     </head>
 
     <body>
 
-        <!-- =====================================================
-             REMOVE DEFAULT LUMA BREADCRUMBS
-             ===================================================== -->
-
+        <!-- REMOVE DEFAULT LUMA BREADCRUMBS -->
         <referenceBlock name="breadcrumbs" remove="true"/>
 
-
-        <!-- =====================================================
-             REMOVE DEFAULT LUMA HEADER
-             ===================================================== -->
-
+        <!-- REMOVE DEFAULT LUMA HEADER -->
         <referenceBlock name="header-wrapper" remove="true"/>
         <referenceBlock name="header.links" remove="true"/>
         <referenceBlock name="skip_to_content" remove="true"/>
@@ -31,31 +28,21 @@
         <referenceBlock name="logo" remove="true"/>
         <referenceBlock name="top.search" remove="true"/>
 
-
-        <!-- =====================================================
-             CLOUDRIGHT HEADER
-             ===================================================== -->
-
+        <!-- CLOUDRIGHT HEADER -->
         <referenceContainer name="header.container">
-
             <container name="cloudright.header"
                        htmlTag="header"
                        htmlClass="cloudright-header"
                        before="-">
 
-                <block class="Magento\Framework\View\Element\Template"
+                <block class="Magento\Checkout\Block\Cart\Sidebar"
                        name="cloudright.header.template"
                        template="Magento_Theme::html/cloudright-header.phtml"/>
 
             </container>
-
         </referenceContainer>
 
-
-        <!-- =====================================================
-             REMOVE DEFAULT LUMA FOOTER
-             ===================================================== -->
-
+        <!-- REMOVE DEFAULT LUMA FOOTER -->
         <referenceBlock name="footer_links" remove="true"/>
         <referenceBlock name="footer_links2" remove="true"/>
         <referenceBlock name="footer" remove="true"/>
@@ -63,25 +50,10 @@
         <referenceBlock name="form.subscribe" remove="true"/>
         <referenceBlock name="newsletter.subscribe" remove="true"/>
 
-
-        <!-- =====================================================
-             CLOUDRIGHT FOOTER
-             ===================================================== -->
-
+        <!-- REMOVE CLOUDRIGHT CUSTOM FOOTER -->
         <referenceContainer name="footer-container">
-
-            <container name="cloudright.footer"
-                       htmlTag="footer"
-                       htmlClass="cloudright-footer">
-
-                <block class="Magento\Framework\View\Element\Template"
-                       name="cloudright.footer.template"
-                       template="Magento_Theme::html/cloudright-footer.phtml"/>
-
-            </container>
-
+            <container name="cloudright.footer" remove="true"/>
         </referenceContainer>
 
     </body>
 </page>
-

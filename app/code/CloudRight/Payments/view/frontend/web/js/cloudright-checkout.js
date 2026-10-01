@@ -1,7 +1,8 @@
 define([
     'jquery',
-    'mage/translate'
-], function ($, $t) {
+    'mage/translate',
+    'Magento_Customer/js/customer-data'
+], function ($, $t, customerData) {
     'use strict';
 
     return function (config, element) {
@@ -12,6 +13,7 @@ define([
             $root = $(element),
             cartApiUrl = config.cartApiUrl,
             orderApiUrl = config.orderApiUrl,
+            customerApiUrl = config.customerApiUrl,
             cartPageUrl = config.cartPageUrl,
             successPageUrl = config.successPageUrl,
             latestCartPayload = null,
@@ -639,6 +641,10 @@ define([
 
                         currentCustomer =
                             response.customer;
+
+                        saveCustomer(
+                            currentCustomer
+                        );
                     }
 
 
@@ -662,6 +668,20 @@ define([
                             .val(
                                 storedCustomer.email
                             );
+
+                        /*
+                         * CloudRight Account is already signed in.
+                         *
+                         * Do not ask the customer to enter the email
+                         * again. Populate the existing customer details
+                         * and continue directly to the Payment step.
+                         */
+
+                        populatePaymentStep();
+
+                        showStep(
+                            'payment'
+                        );
                     }
 
                 })
@@ -754,11 +774,11 @@ define([
                             escapeHtml(
                                 item.image_url
                             ) +
-                            '" alt="' +
-                            escapeHtml(
-                                item.name
-                            ) +
-                            '" class="cloudright-item-image">';
+                                '" alt="' +
+                                escapeHtml(
+                                    item.name
+                                ) +
+                                '" class="cloudright-item-image">';
                     }
 
 
@@ -898,32 +918,124 @@ define([
 
             setButtonLoading(
                 $button,
-                $t('Continuing...')
+                $t('Creating account...')
             );
 
 
-            currentCustomer = {
-                email: email
-            };
+            /*
+             * Create or find the Magento customer.
+             *
+             * This does not change the existing payment flow.
+             * It only ensures that the email exists in Magento's
+             * native customer table before continuing.
+             */
+
+            $.ajax({
+
+                url: customerApiUrl,
+
+                type: 'POST',
+
+                contentType:
+                    'application/json',
+
+                dataType:
+                    'json',
+
+                data:
+                    JSON.stringify({
+
+                        email:
+                            email
+                    })
+            })
+
+                .done(function (response) {
+
+                    if (
+                        !response ||
+                        response.success === false ||
+                        !response.customer ||
+                        !response.customer.email
+                    ) {
+
+                        resetButton(
+                            $button,
+                            $t('Continue')
+                        );
+
+                        showError(
+                            response &&
+                            response.message
+                                ? response.message
+                                : $t(
+                                    'Unable to create your customer account. Please try again.'
+                                )
+                        );
+
+                        return;
+                    }
 
 
-            saveCustomer(
-                currentCustomer
-            );
+                    /*
+                     * Use Magento's returned customer data.
+                     */
+
+                    currentCustomer =
+                        response.customer;
 
 
-            populatePaymentStep();
+                    saveCustomer(
+                        currentCustomer
+                    );
 
 
-            showStep(
-                'payment'
-            );
+                    /*
+                     * Preserve the existing checkout flow.
+                     */
+
+                    populatePaymentStep();
 
 
-            resetButton(
-                $button,
-                $t('Continue')
-            );
+                    showStep(
+                        'payment'
+                    );
+
+
+                    resetButton(
+                        $button,
+                        $t('Continue')
+                    );
+                })
+
+                .fail(function (xhr) {
+
+                    resetButton(
+                        $button,
+                        $t('Continue')
+                    );
+
+
+                    var message =
+                        $t(
+                            'Unable to create your customer account. Please try again.'
+                        );
+
+
+                    if (
+                        xhr.responseJSON &&
+                        xhr.responseJSON.message
+                    ) {
+
+                        message =
+                            xhr.responseJSON.message;
+                    }
+
+
+                    showError(
+                        message
+                    );
+                });
 
 
             return false;
@@ -1019,11 +1131,11 @@ define([
                             escapeHtml(
                                 item.image_url
                             ) +
-                            '" alt="' +
-                            escapeHtml(
-                                item.name
-                            ) +
-                            '" class="cloudright-item-image">';
+                                '" alt="' +
+                                escapeHtml(
+                                    item.name
+                                ) +
+                                '" class="cloudright-item-image">';
                     }
 
 
@@ -1129,6 +1241,40 @@ define([
 
 
             return false;
+        }
+
+
+        /* =========================================================
+         * CART COUNT REFRESH
+         * ========================================================= */
+
+        function refreshCartAfterPayment() {
+
+            try {
+
+                /*
+                 * Magento's minicart uses the customer-data
+                 * "cart" section.
+                 *
+                 * Reloading it after successful payment
+                 * updates the cart icon immediately instead
+                 * of waiting until the customer opens the cart.
+                 */
+
+                return customerData.reload(
+                    ['cart'],
+                    true
+                );
+
+            } catch (error) {
+
+                /*
+                 * Cart refresh should never prevent the
+                 * successful order from redirecting.
+                 */
+
+                return null;
+            }
         }
 
 
@@ -1260,11 +1406,57 @@ define([
                     /*
                      * Payment and order creation succeeded.
                      *
-                     * Magento's checkout session was prepared
-                     * by OrderManagement.php. Redirect to the
-                     * standard Magento Order Received / Thank You
-                     * page instead of showing the custom
-                     * confirmation step.
+                     * Refresh Magento's customer-data cart
+                     * section before redirecting so the header
+                     * minicart changes from the old quantity
+                     * to 0 immediately.
+                     */
+
+                    var refreshResult =
+                        refreshCartAfterPayment();
+
+
+                    if (
+                        refreshResult &&
+                        typeof refreshResult.always === 'function'
+                    ) {
+
+                        refreshResult.always(
+                            function () {
+
+                                /*
+                                 * Magento's checkout session was
+                                 * prepared by OrderManagement.php.
+                                 * Redirect to the standard Magento
+                                 * Order Received / Thank You page.
+                                 */
+
+                                if (successPageUrl) {
+
+                                    window.location.href =
+                                        successPageUrl;
+
+                                    return;
+                                }
+
+
+                                /*
+                                 * Fallback in case the success URL
+                                 * was not provided by Magento.
+                                 */
+
+                                window.location.href =
+                                    '/checkout/onepage/success/';
+                            }
+                        );
+
+                        return;
+                    }
+
+
+                    /*
+                     * Fallback if customer-data reload could
+                     * not be started.
                      */
 
                     if (successPageUrl) {
@@ -1275,11 +1467,6 @@ define([
                         return;
                     }
 
-
-                    /*
-                     * Fallback in case the success URL was not
-                     * provided by Magento.
-                     */
 
                     window.location.href =
                         '/checkout/onepage/success/';

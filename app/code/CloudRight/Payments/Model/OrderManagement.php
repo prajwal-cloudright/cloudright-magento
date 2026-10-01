@@ -7,8 +7,10 @@ use CloudRight\Payments\Api\Data\OrderResultInterfaceFactory;
 use CloudRight\Payments\Api\OrderManagementInterface;
 use CloudRight\Payments\Api\PaymentInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Directory\Helper\Data as DirectoryHelper;
 use Magento\Directory\Model\ResourceModel\Region\CollectionFactory as RegionCollectionFactory;
+use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\TransactionFactory;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
@@ -21,6 +23,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Service\InvoiceService;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 
 class OrderManagement implements OrderManagementInterface
@@ -44,6 +47,9 @@ class OrderManagement implements OrderManagementInterface
     private RegionCollectionFactory $regionCollectionFactory;
     private InvoiceService $invoiceService;
     private TransactionFactory $transactionFactory;
+    private CustomerRepositoryInterface $customerRepository;
+    private StoreManagerInterface $storeManager;
+    private ResourceConnection $resourceConnection;
 
     public function __construct(
         CheckoutSession $checkoutSession,
@@ -57,7 +63,10 @@ class OrderManagement implements OrderManagementInterface
         LoggerInterface $logger,
         RegionCollectionFactory $regionCollectionFactory,
         InvoiceService $invoiceService,
-        TransactionFactory $transactionFactory
+        TransactionFactory $transactionFactory,
+        CustomerRepositoryInterface $customerRepository,
+        StoreManagerInterface $storeManager,
+        ResourceConnection $resourceConnection
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->quoteRepository = $quoteRepository;
@@ -71,10 +80,20 @@ class OrderManagement implements OrderManagementInterface
         $this->regionCollectionFactory = $regionCollectionFactory;
         $this->invoiceService = $invoiceService;
         $this->transactionFactory = $transactionFactory;
+        $this->customerRepository = $customerRepository;
+        $this->storeManager = $storeManager;
+        $this->resourceConnection = $resourceConnection;
     }
 
-    public function createOrder(string $email, string $transactionId): OrderResultInterface
-    {
+    /**
+     * Existing storefront checkout flow.
+     *
+     * This method continues to use the Magento checkout session.
+     */
+    public function createOrder(
+        string $email,
+        string $transactionId
+    ): OrderResultInterface {
         $email = trim($email);
         $transactionId = trim($transactionId);
 
@@ -86,8 +105,33 @@ class OrderManagement implements OrderManagementInterface
 
         $quote->setCustomerEmail($email);
 
+        /*
+         * Link the quote to an existing Magento customer.
+         *
+         * If a customer with this email exists for the current
+         * website, assign that customer to the quote.
+         *
+         * If no customer exists, preserve guest checkout.
+         */
         if (!$quote->getCustomerId()) {
-            $quote->setCustomerIsGuest(true);
+            try {
+                $customer = $this->customerRepository->get(
+                    $email,
+                    (int)$this->storeManager
+                        ->getStore()
+                        ->getWebsiteId()
+                );
+
+                $quote->assignCustomer($customer);
+                $quote->setCustomerIsGuest(false);
+                $quote->setCustomerEmail(
+                    (string)$customer->getEmail()
+                );
+            } catch (NoSuchEntityException $e) {
+                $quote->setCustomerIsGuest(true);
+            }
+        } else {
+            $quote->setCustomerIsGuest(false);
         }
 
         $this->prepareAddresses($quote, $email);
@@ -96,7 +140,10 @@ class OrderManagement implements OrderManagementInterface
 
         try {
             $this->quoteRepository->save($quote);
-            $orderId = $this->quoteManagement->placeOrder($quote->getId());
+
+            $orderId = $this->quoteManagement->placeOrder(
+                $quote->getId()
+            );
         } catch (LocalizedException $e) {
             $this->logger->error(
                 'CloudRight: failed to place order.',
@@ -104,7 +151,10 @@ class OrderManagement implements OrderManagementInterface
             );
 
             throw new CouldNotSaveException(
-                __('CloudRight was unable to create the order: %1', $e->getMessage())
+                __(
+                    'CloudRight was unable to create the order: %1',
+                    $e->getMessage()
+                )
             );
         } catch (\Exception $e) {
             $this->logger->error(
@@ -113,7 +163,9 @@ class OrderManagement implements OrderManagementInterface
             );
 
             throw new CouldNotSaveException(
-                __('CloudRight was unable to create the order due to an unexpected error.')
+                __(
+                    'CloudRight was unable to create the order due to an unexpected error.'
+                )
             );
         }
 
@@ -143,13 +195,7 @@ class OrderManagement implements OrderManagementInterface
         /*
          * CloudRight test payment was successful.
          *
-         * Create and capture the Magento invoice so that Magento records:
-         * - Total Paid
-         * - Invoice
-         * - Total Due
-         *
-         * The custom payment method's capture() method handles the
-         * development/test capture operation.
+         * Create and capture the Magento invoice.
          */
         if ($paymentStatus === PaymentInterface::STATUS_PAID) {
             try {
@@ -163,7 +209,9 @@ class OrderManagement implements OrderManagementInterface
 
                 if (!$invoice->getTotalQty()) {
                     throw new LocalizedException(
-                        __('The CloudRight invoice could not be created because the order has no items.')
+                        __(
+                            'The CloudRight invoice could not be created because the order has no items.'
+                        )
                     );
                 }
 
@@ -218,7 +266,9 @@ class OrderManagement implements OrderManagementInterface
                 );
 
                 throw new CouldNotSaveException(
-                    __('CloudRight payment succeeded, but Magento could not complete the invoice.')
+                    __(
+                        'CloudRight payment succeeded, but Magento could not complete the invoice.'
+                    )
                 );
             }
         }
@@ -226,21 +276,10 @@ class OrderManagement implements OrderManagementInterface
         $this->orderRepository->save($order);
 
         /*
-         * Clear the old checkout storage before preparing the
-         * standard Magento success-page session values.
-         *
-         * clearStorage() can remove checkout session values,
-         * so it must happen before the success values are written.
+         * Preserve the existing storefront success-page session behavior.
          */
         $this->checkoutSession->clearStorage();
 
-        /*
-         * Store the completed checkout information in Magento's
-         * checkout session.
-         *
-         * The standard Magento Order Received / Success page uses
-         * these session values to identify the completed order.
-         */
         if ($paymentStatus === PaymentInterface::STATUS_PAID) {
             $this->checkoutSession->setLastQuoteId(
                 (int)$quote->getId()
@@ -283,25 +322,353 @@ class OrderManagement implements OrderManagementInterface
             )
             ->setMessage(
                 $paymentStatus === PaymentInterface::STATUS_PAID
-                    ? (string)__('CloudRight order created successfully.')
-                    : (string)__('CloudRight order was created but payment is pending review.')
+                    ? (string)__(
+                        'CloudRight order created successfully.'
+                    )
+                    : (string)__(
+                        'CloudRight order was created but payment is pending review.'
+                    )
+            );
+    }
+
+    /**
+     * Create an order from a specific masked Magento cart ID.
+     *
+     * This method is used by the authenticated REST API.
+     *
+     * Unlike createOrder(), this method does not depend on the
+     * browser checkout session.
+     */
+    public function createOrderForCart(
+        string $cartId,
+        string $email,
+        string $transactionId
+    ): OrderResultInterface {
+        $cartId = trim($cartId);
+        $email = trim($email);
+        $transactionId = trim($transactionId);
+
+        if ($cartId === '') {
+            throw new LocalizedException(
+                __('A valid cart id is required.')
+            );
+        }
+
+        $this->validateEmail($email);
+        $this->validateTransactionId($transactionId);
+
+        /*
+         * Resolve Magento's masked cart ID to the internal quote ID.
+         */
+        $connection = $this->resourceConnection->getConnection();
+
+        $quoteIdMaskTable = $this->resourceConnection->getTableName(
+            'quote_id_mask'
+        );
+
+        $select = $connection->select()
+            ->from(
+                $quoteIdMaskTable,
+                ['quote_id']
+            )
+            ->where(
+                'masked_id = ?',
+                $cartId
+            )
+            ->limit(1);
+
+        $quoteId = $connection->fetchOne($select);
+
+        if (!$quoteId) {
+            throw new LocalizedException(
+                __('The specified cart could not be found.')
+            );
+        }
+
+        /*
+         * Load the quote directly from Magento's quote repository.
+         */
+        try {
+            $quote = $this->quoteRepository->get(
+                (int)$quoteId
+            );
+        } catch (NoSuchEntityException $e) {
+            throw new LocalizedException(
+                __('The specified cart could not be found.')
+            );
+        }
+
+        if (!$quote->getId()) {
+            throw new LocalizedException(
+                __('The specified cart could not be found.')
+            );
+        }
+
+        if (!$quote->getIsActive()) {
+            throw new LocalizedException(
+                __('The specified cart is no longer active.')
+            );
+        }
+
+        $this->validateQuoteHasItems($quote);
+
+        /*
+         * Set the customer email.
+         */
+        $quote->setCustomerEmail($email);
+
+        /*
+         * Link the quote to the Magento customer if the customer
+         * already exists for the current website.
+         */
+        if (!$quote->getCustomerId()) {
+            try {
+                $customer = $this->customerRepository->get(
+                    $email,
+                    (int)$this->storeManager
+                        ->getStore()
+                        ->getWebsiteId()
+                );
+
+                $quote->assignCustomer($customer);
+                $quote->setCustomerIsGuest(false);
+                $quote->setCustomerEmail(
+                    (string)$customer->getEmail()
+                );
+            } catch (NoSuchEntityException $e) {
+                /*
+                 * If the customer does not exist, preserve guest order behavior.
+                 */
+                $quote->setCustomerIsGuest(true);
+            }
+        } else {
+            $quote->setCustomerIsGuest(false);
+        }
+
+        /*
+         * Prepare the same address/payment information used
+         * by the existing storefront checkout.
+         */
+        $this->prepareAddresses(
+            $quote,
+            $email
+        );
+
+        $this->assignPaymentMethod($quote);
+
+        $quote->collectTotals();
+
+        /*
+         * Save the quote and create the Magento order.
+         */
+        try {
+            $this->quoteRepository->save($quote);
+
+            $orderId = $this->quoteManagement->placeOrder(
+                $quote->getId()
+            );
+        } catch (LocalizedException $e) {
+            $this->logger->error(
+                'CloudRight: failed to place REST API order.',
+                [
+                    'cart_id' => $cartId,
+                    'quote_id' => $quote->getId(),
+                    'exception' => $e
+                ]
+            );
+
+            throw new CouldNotSaveException(
+                __(
+                    'CloudRight was unable to create the order: %1',
+                    $e->getMessage()
+                )
+            );
+        } catch (\Exception $e) {
+            $this->logger->error(
+                'CloudRight: unexpected error while placing REST API order.',
+                [
+                    'cart_id' => $cartId,
+                    'quote_id' => $quote->getId(),
+                    'exception' => $e
+                ]
+            );
+
+            throw new CouldNotSaveException(
+                __(
+                    'CloudRight was unable to create the order due to an unexpected error.'
+                )
+            );
+        }
+
+        /*
+         * Reload the newly created order.
+         */
+        try {
+            $order = $this->orderRepository->get(
+                $orderId
+            );
+        } catch (NoSuchEntityException $e) {
+            throw new CouldNotSaveException(
+                __('CloudRight order was placed but could not be reloaded.')
+            );
+        }
+
+        /*
+         * Process the CloudRight payment.
+         */
+        $paymentStatus = $this->paymentService->processPayment(
+            (int)$orderId,
+            $transactionId
+        );
+
+        $order->setData(
+            'cloudright_transaction_id',
+            $transactionId
+        );
+
+        $order->setData(
+            'cloudright_payment_status',
+            $paymentStatus
+        );
+
+        /*
+         * Create and capture Magento invoice when payment succeeds.
+         */
+        if ($paymentStatus === PaymentInterface::STATUS_PAID) {
+            try {
+                if (!$order->canInvoice()) {
+                    throw new LocalizedException(
+                        __('The CloudRight order cannot be invoiced.')
+                    );
+                }
+
+                $invoice = $this->invoiceService->prepareInvoice(
+                    $order
+                );
+
+                if (!$invoice->getTotalQty()) {
+                    throw new LocalizedException(
+                        __(
+                            'The CloudRight invoice could not be created because the order has no items.'
+                        )
+                    );
+                }
+
+                $invoice->setRequestedCaptureCase(
+                    Invoice::CAPTURE_ONLINE
+                );
+
+                $invoice->register();
+
+                $invoice->getOrder()->setIsInProcess(true);
+
+                $transaction = $this->transactionFactory->create()
+                    ->addObject($invoice)
+                    ->addObject($invoice->getOrder());
+
+                $transaction->save();
+
+                $order = $invoice->getOrder();
+
+                $this->logger->info(
+                    'CloudRight: REST API invoice created and captured.',
+                    [
+                        'cart_id' => $cartId,
+                        'quote_id' => $quote->getId(),
+                        'order_id' => $orderId,
+                        'invoice_id' => $invoice->getId(),
+                        'transaction_id' => $transactionId
+                    ]
+                );
+            } catch (LocalizedException $e) {
+                $this->logger->error(
+                    'CloudRight: REST API payment succeeded but invoice creation failed.',
+                    [
+                        'cart_id' => $cartId,
+                        'order_id' => $orderId,
+                        'transaction_id' => $transactionId,
+                        'exception' => $e
+                    ]
+                );
+
+                throw new CouldNotSaveException(
+                    __(
+                        'CloudRight payment succeeded, but the Magento invoice could not be created: %1',
+                        $e->getMessage()
+                    )
+                );
+            } catch (\Exception $e) {
+                $this->logger->error(
+                    'CloudRight: unexpected REST API invoice error.',
+                    [
+                        'cart_id' => $cartId,
+                        'order_id' => $orderId,
+                        'transaction_id' => $transactionId,
+                        'exception' => $e
+                    ]
+                );
+
+                throw new CouldNotSaveException(
+                    __(
+                        'CloudRight payment succeeded, but Magento could not complete the invoice.'
+                    )
+                );
+            }
+        }
+
+        /*
+         * Save the final order state.
+         *
+         * We intentionally do NOT modify checkoutSession here.
+         * This is an authenticated REST API request and does not
+         * depend on the browser checkout session.
+         */
+        $this->orderRepository->save($order);
+
+        return $this->orderResultFactory->create()
+            ->setSuccess(
+                $paymentStatus === PaymentInterface::STATUS_PAID
+            )
+            ->setOrderId(
+                (int)$orderId
+            )
+            ->setOrderIncrementId(
+                $order->getIncrementId()
+            )
+            ->setTransactionId(
+                $transactionId
+            )
+            ->setMessage(
+                $paymentStatus === PaymentInterface::STATUS_PAID
+                    ? (string)__(
+                        'CloudRight order created successfully.'
+                    )
+                    : (string)__(
+                        'CloudRight order was created but payment is pending review.'
+                    )
             );
     }
 
     private function validateEmail(string $email): void
     {
-        if ($email === '' || !$this->emailValidator->isValid($email)) {
+        if (
+            $email === ''
+            || !$this->emailValidator->isValid($email)
+        ) {
             throw new LocalizedException(
                 __('Please provide a valid email address.')
             );
         }
     }
 
-    private function validateTransactionId(string $transactionId): void
-    {
+    private function validateTransactionId(
+        string $transactionId
+    ): void {
         if (
             $transactionId === ''
-            || !$this->paymentService->isValidTransactionId($transactionId)
+            || !$this->paymentService->isValidTransactionId(
+                $transactionId
+            )
         ) {
             throw new LocalizedException(
                 __('A valid CloudRight transaction id is required.')
@@ -483,3 +850,4 @@ class OrderManagement implements OrderManagementInterface
         ]);
     }
 }
+
