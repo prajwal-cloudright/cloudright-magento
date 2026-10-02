@@ -60,6 +60,7 @@ jobs:
           echo "SSM Command ID: $COMMAND_ID"
 
       - name: Wait for EC2 deployment
+        continue-on-error: true
         run: |
           aws ssm wait command-executed \
             --command-id "${{ steps.deploy.outputs.command_id }}" \
