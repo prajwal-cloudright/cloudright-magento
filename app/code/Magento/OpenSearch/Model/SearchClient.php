@@ -67,10 +67,12 @@ class SearchClient implements ClientInterface
                 __('The search failed because of a search engine misconfiguration.')
             );
         }
+
         // phpstan:ignore
         if ($openSearchClient instanceof Client) {
             $this->client[getmypid()] = $openSearchClient;
         }
+
         $this->clientOptions = $options;
         $this->fieldsMappingPreprocessors = $fieldsMappingPreprocessors;
         $this->dynamicTemplatesProvider = $dynamicTemplatesProvider ?: ObjectManager::getInstance()
@@ -96,10 +98,12 @@ class SearchClient implements ClientInterface
     public function getOpenSearchClient(): Client
     {
         $pid = getmypid();
+
         if (!isset($this->client[$pid])) {
             $config = $this->buildOSConfig($this->clientOptions);
             $this->client[$pid] = ClientBuilder::fromConfig($config, true);
         }
+
         return $this->client[$pid];
     }
 
@@ -137,19 +141,29 @@ class SearchClient implements ClientInterface
     private function buildOSConfig(array $options = []): array
     {
         $hostname = preg_replace('/http[s]?:\/\//i', '', $options['hostname']);
+
         // @codingStandardsIgnoreStart
         $protocol = parse_url($options['hostname'], PHP_URL_SCHEME);
         // @codingStandardsIgnoreEnd
+
+        /*
+         * AWS OpenSearch requires HTTPS on port 443.
+         * Magento may store the hostname without its URL scheme,
+         * so when no scheme is present, use HTTPS for port 443
+         * and HTTP for other ports such as the local OpenSearch 9200.
+         */
         if (!$protocol) {
-            $protocol = 'http';
+            $protocol = ((int)($options['port'] ?? 0) === 443) ? 'https' : 'http';
         }
 
         $authString = '';
+
         if (!empty($options['enableAuth']) && (int)$options['enableAuth'] === 1) {
             $authString = "{$options['username']}:{$options['password']}@";
         }
 
         $portString = '';
+
         if (!empty($options['port'])) {
             $portString = ':' . $options['port'];
         }
@@ -162,7 +176,7 @@ class SearchClient implements ClientInterface
     }
 
     /**
-     * Performs bulk query over OpenSearch  index
+     * Performs bulk query over OpenSearch index
      *
      * @param array $query
      * @return array
@@ -225,7 +239,13 @@ class SearchClient implements ClientInterface
      */
     public function isEmptyIndex(string $index): bool
     {
-        $stats = $this->getOpenSearchClient()->indices()->stats(['index' => $index, 'metric' => 'docs']);
+        $stats = $this->getOpenSearchClient()->indices()->stats(
+            [
+                'index' => $index,
+                'metric' => 'docs',
+            ]
+        );
+
         if ($stats['indices'][$index]['primaries']['docs']['count'] === 0) {
             return true;
         }
@@ -248,11 +268,23 @@ class SearchClient implements ClientInterface
                 'actions' => [],
             ],
         ];
+
         if ($oldIndex) {
-            $params['body']['actions'][] = ['remove' => ['alias' => $alias, 'index' => $oldIndex]];
+            $params['body']['actions'][] = [
+                'remove' => [
+                    'alias' => $alias,
+                    'index' => $oldIndex,
+                ],
+            ];
         }
+
         if ($newIndex) {
-            $params['body']['actions'][] = ['add' => ['alias' => $alias, 'index' => $newIndex]];
+            $params['body']['actions'][] = [
+                'add' => [
+                    'alias' => $alias,
+                    'index' => $newIndex,
+                ],
+            ];
         }
 
         $this->getOpenSearchClient()->indices()->updateAliases($params);
@@ -266,7 +298,9 @@ class SearchClient implements ClientInterface
      */
     public function indexExists(string $index): bool
     {
-        return $this->getOpenSearchClient()->indices()->exists(['index' => $index]);
+        return $this->getOpenSearchClient()->indices()->exists(
+            ['index' => $index]
+        );
     }
 
     /**
@@ -279,6 +313,7 @@ class SearchClient implements ClientInterface
     public function existsAlias(string $alias, string $index = ''): bool
     {
         $params = ['name' => $alias];
+
         if ($index) {
             $params['index'] = $index;
         }
@@ -294,7 +329,9 @@ class SearchClient implements ClientInterface
      */
     public function getAlias(string $alias): array
     {
-        return $this->getOpenSearchClient()->indices()->getAlias(['name' => $alias]);
+        return $this->getOpenSearchClient()->indices()->getAlias(
+            ['name' => $alias]
+        );
     }
 
     /**
@@ -376,6 +413,7 @@ class SearchClient implements ClientInterface
         foreach ($this->fieldsMappingPreprocessors as $preprocessor) {
             $properties = $preprocessor->process($properties);
         }
+
         return $properties;
     }
 
@@ -401,3 +439,4 @@ class SearchClient implements ClientInterface
         return $this->getOpenSearchClient()->deletePointInTime($params);
     }
 }
+
