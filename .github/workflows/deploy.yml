@@ -52,7 +52,7 @@ jobs:
             --instance-ids "$EC2_INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --comment "CloudRight Magento deployment ${GITHUB_SHA}" \
-            --parameters "commands=[\"sudo /opt/cloudright-magento/deploy.sh ${GITHUB_SHA}\"]" \
+            --parameters "commands=[\"sudo sed -i 's#\\$CONFIG_DIR/config.php:/var/www/html/app/etc/config.php:ro#\\$CONFIG_DIR/config.php:/var/www/html/app/etc/config.php#' /opt/cloudright-magento/deploy.sh && sudo /opt/cloudright-magento/deploy.sh ${GITHUB_SHA}\"]" \
             --query "Command.CommandId" \
             --output text)
 
