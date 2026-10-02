@@ -29,28 +29,44 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Inspect EC2 deploy script
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -f docker/Dockerfile \
+            -t "$ECR_REGISTRY/$ECR_REPOSITORY:${GITHUB_SHA}" \
+            -t "$ECR_REGISTRY/$ECR_REPOSITORY:latest" \
+            .
+
+      - name: Push Docker image
+        run: |
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:${GITHUB_SHA}"
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
+
+      - name: Deploy to EC2
         id: deploy
         run: |
           COMMAND_ID=$(aws ssm send-command \
             --instance-ids "$EC2_INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
-            --comment "Inspect Magento deploy script" \
-            --parameters "commands=[\"echo '=============================================='; echo ' CURRENT CONFIG.PHP MOUNT'; echo '=============================================='; sudo grep -n -A3 -B3 'config.php' /opt/cloudright-magento/deploy.sh\"]" \
+            --comment "CloudRight Magento deployment ${GITHUB_SHA}" \
+            --parameters "commands=[\"sudo chown 33:33 /opt/cloudright-magento/config/config.php && sudo /opt/cloudright-magento/deploy.sh ${GITHUB_SHA}\"]" \
             --query "Command.CommandId" \
             --output text)
 
           echo "command_id=$COMMAND_ID" >> "$GITHUB_OUTPUT"
           echo "SSM Command ID: $COMMAND_ID"
 
-      - name: Wait for EC2 inspection
+      - name: Wait for EC2 deployment
         continue-on-error: true
         run: |
           aws ssm wait command-executed \
             --command-id "${{ steps.deploy.outputs.command_id }}" \
             --instance-id "$EC2_INSTANCE_ID"
 
-      - name: Show EC2 inspection result
+      - name: Show deployment result
         run: |
           aws ssm get-command-invocation \
             --command-id "${{ steps.deploy.outputs.command_id }}" \
